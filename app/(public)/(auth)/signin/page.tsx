@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { signinAction } from "./actions";
+import axios from "axios";
 
 type SigninMethod = "email" | "phone";
 
@@ -47,20 +48,22 @@ export default function SigninPage() {
 
   const onSubmitEmail = async (values: EmailForm) => {
     setError("");
-    
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.append("identifier", values.email);
-      formData.append("type", "email");
+
+    const result = await axios.post("/api/auth/signin", { identifier: values.email, type: "email"})
+    console.log(result)
+    // startTransition(async () => {
+    //   const formData = new FormData();
+    //   formData.append("identifier", values.email);
+    //   formData.append("type", "email");
       
-      const result = await signinAction(formData);
+    //   const result = await signinAction(formData);
       
-      if (result?.error) {
-        setError(result.error);
-      } else if (result?.success) {
-        router.push(`/otp?type=email&identifier=${encodeURIComponent(values.email)}`);
-      }
-    });
+    //   if (result?.error) {
+    //     setError(result.error);
+    //   } else if (result?.success) {
+    //     router.push(`/otp?type=email&identifier=${encodeURIComponent(values.email)}`);
+    //   }
+    // });
   };
 
   const onSubmitPhone = async (values: PhoneForm) => {
