@@ -107,7 +107,8 @@ export async function POST(request: NextRequest) {
 
     return addSecurityHeaders(response);
 
-  } catch (error) {
+  } catch (error: any) {
+    console.error("MongoDB Error (Vercel):", error, error?.message);
     return addSecurityHeaders(handleApiError(error));
   }
 }
