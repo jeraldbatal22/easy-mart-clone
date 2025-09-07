@@ -47,7 +47,7 @@ export const OnboardingStepContent = ({
           />
         );
 
-      case "q4":
+      case "q4": 
         return (
           <RadioOptionSelector
             options={step.options as string[]}
