@@ -1,42 +1,118 @@
+@import "tailwindcss";
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  font-family: "Roboto", sans-serif;
+}
+
+@theme {
+  --color-black-900: #181818;
+  --color-black-800: #232124;
+  --color-black-700: #373338;
+  --color-black-600: #4d4950;
+  --color-black-500: #6c6770;
+  --color-black-400: #a49fa7;
+  --color-black-300: #c2bec4;
+  --color-black-200: #e0dee1;
+  --color-black-100: #f5f4f6;
+  --color-black-50:  #fafafd;
+
+  --color-primary-900: #6C2358;
+  --color-primary-800: #83256B;
+  --color-primary-700: #A02B84;
+  --color-primary-600: #B6349A;
+  --color-primary-500: #DE57C4;
+  --color-primary-400: #EC86D8;
+  --color-primary-300: #F4B3E9;
+  --color-primary-200: #F9D5F4;
+  --color-primary-100: #FDEAFB;
+  --color-primary-50:  #FEF5FD;
+
+  --color-orange-900: #6d2a0d;
+  --color-orange-800: #8a3a13;
+  --color-orange-700: #b44d1a;
+  --color-orange-600: #e05a1e;
+  --color-orange-500: #ff6a22;
+  --color-orange-400: #ff8a4d;
+  --color-orange-300: #ffb088;
+  --color-orange-200: #ffd0b8;
+  --color-orange-100: #ffe7db;
+  --color-orange-50:  #fff7f3;
+
+  /* Typography scale based on provided image */
+
+  /* Display */
+  --text-display-2xl: 4rem;      /* 64px */
+  --text-display-xl: 3.5rem;     /* 56px */
+  --text-display-lg: 3rem;       /* 48px */
+  --text-display-md: 2.25rem;    /* 36px */
+  --text-display-sm: 2rem;       /* 32px */
+
+  /* Headings */
+  --text-heading-1: 2.25rem;     /* 36px */
+  --text-heading-2: 1.875rem;    /* 30px */
+  --text-heading-3: 1.5rem;      /* 24px */
+  --text-heading-4: 1.25rem;     /* 20px */
+  --text-heading-5: 1.125rem;    /* 18px */
+  --text-heading-6: 1rem;        /* 16px */
+
+  /* Body */
+  --text-body-xl: 1.25rem;       /* 20px */
+  --text-body-lg: 1.125rem;      /* 18px */
+  --text-body: 1rem;             /* 16px */
+  --text-body-sm: 0.875rem;      /* 14px */
+  --text-body-xs: 0.75rem;       /* 12px */
+
+  /* Caption & Overline */
+  --text-caption: 0.75rem;       /* 12px */
+  --text-overline: 0.75rem;      /* 12px */
+
+  /* Label */
+  --text-label-lg: 1rem;         /* 16px */
+  --text-label: 0.875rem;        /* 14px */
+  --text-label-sm: 0.75rem;      /* 12px */
+
+  /* --background: var(--black-50);
+  --foreground: var(--black-900); */
+
+/* Grid system variables based on provided image */
+
+/* Desktop 1440px */
+--grid-columns-desktop: 12;
+--grid-gutter-desktop: 32px;
+--grid-column-width-desktop: 81px; /* 12 columns * 81px + 11 gutters * 32px ≈ 1400px grid area */
+
+/* Mobile 375px */
+--grid-columns-mobile: 4;
+--grid-gutter-mobile: 32px;
+--grid-column-width-mobile: 63px; /* 4 columns * 63px + 3 gutters * 32px ≈ 342px grid area */
+
+/* Example usage for grid container and columns (utility classes or custom CSS):
+.grid-desktop {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns-desktop), minmax(0, 1fr));
+  gap: var(--grid-gutter-desktop);
+}
+
+.grid-mobile {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns-mobile), minmax(0, 1fr));
+  gap: var(--grid-gutter-mobile);
+}
+*/
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* --background: var(--black-900);
+    --foreground: var(--black-100); */
   }
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+/* Custom utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
 }
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.scrollbar-hide::-webkit-scrollbar { 
+  display: none;  /* Safari and Chrome */
 }
