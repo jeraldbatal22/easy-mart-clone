@@ -39,7 +39,7 @@ export async function signinAction(
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-      }/api/auth/signins`,
+      }/api/auth/signin`,
       {
         method: "POST",
         headers: {
