@@ -6,7 +6,9 @@ export interface SigninActionResult {
   data?: any;
 }
 
-export async function signinAction(formData: FormData): Promise<SigninActionResult> {
+export async function signinAction(
+  formData: FormData
+): Promise<SigninActionResult> {
   try {
     const identifier = formData.get("identifier") as string;
     const type = formData.get("type") as "email" | "phone";
@@ -34,16 +36,21 @@ export async function signinAction(formData: FormData): Promise<SigninActionResu
     }
 
     // Make the API call to our existing signin endpoint
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/auth/signin`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        identifier,
-        type,
-      }),
-    });
+    const response = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+      }/api/auth/signin`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identifier,
+          type,
+        }),
+      }
+    );
 
     const data = await response.json();
 
@@ -57,11 +64,10 @@ export async function signinAction(formData: FormData): Promise<SigninActionResu
       success: true,
       data: data.data,
     };
-
-  } catch (error) {
+  } catch (error: any) {
     console.error("Signin action error:", error);
     return {
-      error: "An unexpected error occurred. Please try again.",
+      error: error || "An unexpected error occurred. Please try again.",
     };
   }
 }
