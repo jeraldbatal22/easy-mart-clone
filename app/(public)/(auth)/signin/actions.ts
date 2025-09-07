@@ -39,7 +39,7 @@ export async function signinAction(
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-      }/api/auth/signin`,
+      }/api/auth/signins`,
       {
         method: "POST",
         headers: {
@@ -67,7 +67,7 @@ export async function signinAction(
   } catch (error: any) {
     console.error("Signin action error:", error);
     return {
-      error: error || "An unexpected error occurred. Please try again.",
+      error: error.message || "An unexpected error occurred. Please try again.",
     };
   }
 }
