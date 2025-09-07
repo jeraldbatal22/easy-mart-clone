@@ -47,36 +47,40 @@ export default function SigninPage() {
 
   const onSubmitEmail = async (values: EmailForm) => {
     setError("");
-    
+
     startTransition(async () => {
       const formData = new FormData();
       formData.append("identifier", values.email);
       formData.append("type", "email");
-      
+
       const result = await signinAction(formData);
-      
+
       if (result?.error) {
         setError(result.error);
       } else if (result?.success) {
-        router.push(`/otp?type=email&identifier=${encodeURIComponent(values.email)}`);
+        router.push(
+          `/otp?type=email&identifier=${encodeURIComponent(values.email)}`
+        );
       }
     });
   };
 
   const onSubmitPhone = async (values: PhoneForm) => {
     setError("");
-    
+
     startTransition(async () => {
       const formData = new FormData();
       formData.append("identifier", values.phone);
       formData.append("type", "phone");
-      
+
       const result = await signinAction(formData);
-      
+
       if (result?.error) {
         setError(result.error);
       } else if (result?.success) {
-        router.push(`/otp?type=phone&identifier=${encodeURIComponent(values.phone)}`);
+        router.push(
+          `/otp?type=phone&identifier=${encodeURIComponent(values.phone)}`
+        );
       }
     });
   };
@@ -146,6 +150,13 @@ export default function SigninPage() {
                     >
                       <span>{isPending ? "Sending..." : "Continue"}</span>
                       <span aria-hidden>→</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => router.push("/signup")}
+                      className="mt-2 w-full h-12 gap-2 rounded-full text-white !bg-purple-500"
+                    >
+                      <span>Signup</span>
                     </Button>
                   </form>
                 ) : (

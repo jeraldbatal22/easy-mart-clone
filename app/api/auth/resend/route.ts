@@ -12,6 +12,8 @@ import {
 import { handleApiError, ValidationError, NotFoundError } from "@/lib/auth/errors";
 import { createSuccessResponse, createErrorResponse } from "@/lib/auth/response";
 import { checkRateLimit, getClientIP, addSecurityHeaders, sanitizeInput } from "@/lib/auth/security";
+import { logger } from "@/lib/auth/logger";
+import { emailService } from "@/lib/services/emailService";
 
 export async function POST(request: NextRequest) {
   try {
@@ -82,19 +84,39 @@ export async function POST(request: NextRequest) {
     user.verificationCodes.push(verificationCodeRecord._id);
     await user.save();
 
-    // In a real application, you would send the verification code via:
-    // - Email service (SendGrid, AWS SES, etc.) for email
-    // - SMS service (Twilio, AWS SNS, etc.) for phone
-    // For now, we'll return it in the response for development
+    // Send verification code via email or SMS
+    let emailSent = false;
+    if (identifierType === "email") {
+      try {
+        emailSent = await emailService.sendOTPEmail(sanitizedIdentifier, verificationCode, true);
+        if (emailSent) {
+          logger.info(`Resend OTP email sent successfully to ${sanitizedIdentifier}`);
+        } else {
+          logger.warn(`Failed to send resend OTP email to ${sanitizedIdentifier}`);
+        }
+      } catch (error: any) {
+        logger.error(`Error sending resend OTP email to ${sanitizedIdentifier}:`, error);
+      }
+    }
+    // TODO: Implement SMS service for phone verification
+    // else if (identifierType === "phone") {
+    //   // Send SMS via Twilio, AWS SNS, etc.
+    // }
+
+    const responseData: any = {
+      expiresAt: verificationCodeRecord.expiresAt,
+      identifier: sanitizedIdentifier,
+      type: identifierType,
+    };
+
+    // Only include verification code in development or if email failed
+    if (process.env.NODE_ENV === 'development' || !emailSent) {
+      responseData.verificationCode = verificationCode;
+    }
 
     const response = createSuccessResponse(
-      {
-        // verificationCode: verificationCode, // Remove this in production
-        expiresAt: verificationCodeRecord.expiresAt,
-        identifier: sanitizedIdentifier,
-        type: identifierType,
-      },
-      `New verification code sent to ${sanitizedIdentifier}`
+      responseData,
+      `New verification code ${emailSent ? 'sent to' : 'generated for'} ${sanitizedIdentifier}`
     );
 
     return addSecurityHeaders(response);

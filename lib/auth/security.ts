@@ -22,7 +22,7 @@ export function getClientIP(request: NextRequest): string {
 export function checkRateLimit(
   identifier: string,
   maxRequests: number = 5,
-  windowMs: number = 15 * 60 * 1000 // 15 minutes
+  windowMs: number = 1 * 60 * 1000 // 15 minutes
 ): boolean {
   const now = Date.now();
   const key = `rate_limit:${identifier}`;

@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { signupWithEmail, signupWithPhone } from "./actions";
+import { useRouter } from "next/navigation";
 
 type SignupMethod = "email" | "phone";
 
@@ -26,6 +28,9 @@ type PhoneForm = z.infer<typeof phoneSchema>;
 
 export default function SignupPage() {
   const [method, setMethod] = useState<SignupMethod>("email");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const emailForm = useForm<EmailForm>({
     resolver: zodResolver(emailSchema),
@@ -39,14 +44,54 @@ export default function SignupPage() {
     mode: "onSubmit",
   });
 
-  const onSubmitEmail = (values: EmailForm) => {
-    // Replace with your signup logic
-    console.log("signup email", values);
+  const onSubmitEmail = async (values: EmailForm) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("email", values.email);
+
+      const result = await signupWithEmail(formData);
+
+      if (result.success) {
+        // Redirect to OTP page with email parameters
+        router.push(
+          `/otp?type=email&identifier=${encodeURIComponent(values.email)}`
+        );
+      } else {
+        setError(result.error || "Failed to register with email");
+      }
+    } catch (error: any) {
+      setError(error.message || "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const onSubmitPhone = (values: PhoneForm) => {
-    // Replace with your signup logic
-    console.log("signup phone", values);
+  const onSubmitPhone = async (values: PhoneForm) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("phone", values.phone);
+
+      const result = await signupWithPhone(formData);
+
+      if (result.success) {
+        // Redirect to OTP page with phone parameters
+        router.push(
+          `/otp?type=phone&identifier=${encodeURIComponent(values.phone)}`
+        );
+      } else {
+        setError(result.error || "Failed to register with phone");
+      }
+    } catch (error: any) {
+      setError(error.message || "An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -57,6 +102,11 @@ export default function SignupPage() {
             <div className="w-full max-w-md">
               <h1 className="text-2xl font-semibold text-start">Sign up</h1>
               <div className="mt-6 w-full rounded-2xl border border-neutral-200 p-4 sm:p-6 shadow-sm">
+                {error && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                    {error}
+                  </div>
+                )}
                 <div className="flex gap-2 flex-col sm:flex-row">
                   <Button
                     variant="ghost"
@@ -105,10 +155,20 @@ export default function SignupPage() {
                     )}
                     <Button
                       type="submit"
+                      disabled={isLoading}
                       className="mt-2 h-12 w-full gap-2 rounded-full"
                     >
-                      <span>Continue</span>
-                      <span aria-hidden>→</span>
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Signing up...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Continue</span>
+                          <span aria-hidden>→</span>
+                        </>
+                      )}
                     </Button>
                   </form>
                 ) : (
@@ -130,10 +190,20 @@ export default function SignupPage() {
                     )}
                     <Button
                       type="submit"
+                      disabled={isLoading}
                       className="mt-2 w-full h-12 gap-2 rounded-full"
                     >
-                      <span>Continue</span>
-                      <span aria-hidden>→</span>
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span>Signing up...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Continue</span>
+                          <span aria-hidden>→</span>
+                        </>
+                      )}
                     </Button>
                   </form>
                 )}

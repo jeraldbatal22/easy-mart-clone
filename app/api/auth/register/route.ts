@@ -19,6 +19,8 @@ import {
   addSecurityHeaders,
   sanitizeInput,
 } from "@/lib/auth/security";
+import { logger } from "@/lib/auth/logger";
+import { emailService } from "@/lib/services/emailService";
 import { z } from "zod";
 
 // Registration validation schema
@@ -39,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // Rate limiting
     const clientIP = getClientIP(request);
-    if (!checkRateLimit(`register:${clientIP}`, 3, 15 * 60 * 1000)) {
+    if (!checkRateLimit(`register:${clientIP}`, 3, 1 * 60 * 1000)) {
       return addSecurityHeaders(
         createErrorResponse(
           "Too many registration attempts. Please try again later.",
@@ -116,20 +118,44 @@ export async function POST(request: NextRequest) {
     user.verificationCodes.push(verificationCodeRecord._id);
     await user.save();
 
-    // In a real application, you would send the verification code via:
-    // - Email service (SendGrid, AWS SES, etc.) for email
-    // - SMS service (Twilio, AWS SNS, etc.) for phone
-    // For now, we'll return it in the response for development
+    // Send verification code via email or SMS
+    let emailSent = false;
+    console.log(identifierType, "identifierTypeidentifierTypeidentifierType")
+    if (identifierType === "email") {
+      try {
+        emailSent = await emailService.sendOTPEmail(sanitizedIdentifier, verificationCode, false);
+        if (emailSent) {
+          logger.info(`Registration OTP email sent successfully to ${sanitizedIdentifier}`);
+        } else {
+          logger.warn(`Failed to send registration OTP email to ${sanitizedIdentifier}`);
+        }
+      } catch (error) {
+        logger.error(`Error sending registration OTP email to ${sanitizedIdentifier}`, {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
+      }
+    }
+    // TODO: Implement SMS service for phone verification
+    // else if (identifierType === "phone") {
+    //   // Send SMS via Twilio, AWS SNS, etc.
+    // }
+
+    const responseData: any = {
+      expiresAt: verificationCodeRecord.expiresAt,
+      identifier: sanitizedIdentifier,
+      type: identifierType,
+      userId: user._id.toString(),
+    };
+
+    // Only include verification code in development or if email failed
+    if (process.env.NODE_ENV === 'development' || !emailSent) {
+      responseData.verificationCode = verificationCode;
+    }
 
     const response = createSuccessResponse(
-      {
-        verificationCode: verificationCode, // Remove this in production
-        expiresAt: verificationCodeRecord.expiresAt,
-        identifier: sanitizedIdentifier,
-        type: identifierType,
-        userId: user._id.toString(),
-      },
-      `User registered successfully. Verification code sent to ${sanitizedIdentifier}`
+      responseData,
+      `User registered successfully. Verification code ${emailSent ? 'sent to' : 'generated for'} ${sanitizedIdentifier}`
     );
 
     return addSecurityHeaders(response);
