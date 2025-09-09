@@ -9,8 +9,15 @@ interface OtpPageProps {
   };
 }
 
-export default function OtpPage({ searchParams }: OtpPageProps) {
-  const { type, identifier } = searchParams;
+export default async function OtpPage({
+  searchParams,
+}: {
+  searchParams:
+    | OtpPageProps["searchParams"]
+    | Promise<OtpPageProps["searchParams"]>;
+}) {
+  const resolvedSearchParams = await Promise.resolve(searchParams);
+  const { type, identifier } = resolvedSearchParams;
 
   // Validate required parameters
   if (!type || !identifier) {
