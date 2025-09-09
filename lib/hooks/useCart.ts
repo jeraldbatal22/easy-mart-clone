@@ -1,30 +1,33 @@
 import { useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
-import {
-  fetchCart,
-  addToCart,
-  updateCartItem,
-  removeFromCart,
-  clearCart,
-  increaseQuantity,
-  decreaseQuantity,
-  clearError,
-  setAuthenticationStatus,
-  loadGuestCart,
-  selectCart,
-  selectCartLoading,
-  selectCartError,
-  selectCartItems,
-  selectCartTotalItems,
-  selectCartTotalAmount,
-  selectCartSubtotal,
-  selectCartDeliveryFee,
-  // selectIsAuthenticated,
-} from "@/lib/slices/cartSlice";
+
 import { AddToCartRequest, UpdateCartItemRequest } from "@/lib/api/cartApi";
 import { useAuth } from "./useAuth";
 import { useClientOnly } from "./useClientOnly";
 import { useAppDispatch } from "../hooks";
+import {
+  clearError,
+  selectCart,
+  selectCartDeliveryFee,
+  selectCartError,
+  selectCartItems,
+  selectCartLoading,
+  selectCartSubtotal,
+  selectCartTotalAmount,
+  selectCartTotalItems,
+  // selectIsAuthenticated,
+} from "../slices/cart/reducer";
+import {
+  addToCart,
+  clearCart,
+  decreaseQuantity,
+  fetchCart,
+  increaseQuantity,
+  loadGuestCart,
+  removeFromCart,
+  setAuthenticationStatus,
+  updateCartItem,
+} from "../slices/cart/action";
 
 export const useCart = () => {
   const dispatch = useAppDispatch();
