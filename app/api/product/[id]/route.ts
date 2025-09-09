@@ -7,7 +7,7 @@ import { Types } from "mongoose";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -26,7 +26,7 @@ export async function GET(
       );
     }
 
-    const { id } = params || {};
+    const { id } = await params;
     if (!id || !Types.ObjectId.isValid(id)) {
       return addSecurityHeaders(
         NextResponse.json(
