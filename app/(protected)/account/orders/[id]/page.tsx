@@ -8,7 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function OrderDetailsPage({ params: _params }: { params: { id: string } }) {
+const OrderDetailsPage = () => {
   const router = useRouter();
   // Mock data - replace with actual data fetching
   const orderData = {
@@ -295,3 +295,5 @@ export default function OrderDetailsPage({ params: _params }: { params: { id: st
     </div>
   );
 }
+
+export default OrderDetailsPage;
