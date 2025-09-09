@@ -33,9 +33,9 @@ const heroRows = [
 
 export const HeroBanner = () => {
   return (
-    <section className="py-8">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="w-full grid gap-4">
+    <section className="hidden md:block py-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 w-6xl">
+        <div className="grid gap-4">
           {heroRows.map((row, rowIdx) => (
             <div className="flex gap-3" key={rowIdx}>
               {row.map((img, imgIdx) => (
@@ -44,7 +44,7 @@ export const HeroBanner = () => {
                     src={img.src}
                     alt="card.title"
                     fill
-                    className="object-cover rounded-3xl"
+                    className="object-fill rounded-3xl"
                     priority
                   />
                 </div>

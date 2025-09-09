@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   id: string;
@@ -12,6 +13,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({
+  id,
   name,
   image,
   price,
@@ -21,8 +23,10 @@ export const ProductCard = ({
   // isVerified = false
 }: ProductCardProps) => {
 
+  const router = useRouter();
+
   return (
-    <div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer flex flex-col">
+    <div onClick={() => router.push(`/products/${id}`)} className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer flex flex-col">
       <div className="relative">
         <div className="w-full h-40 xs:h-48 sm:h-60 relative bg-primary-50 rounded-xl flex items-center justify-center mb-2 sm:mb-3 overflow-hidden">
           <Image

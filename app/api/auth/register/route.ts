@@ -120,7 +120,6 @@ export async function POST(request: NextRequest) {
 
     // Send verification code via email or SMS
     let emailSent = false;
-    console.log(identifierType, "identifierTypeidentifierTypeidentifierType")
     if (identifierType === "email") {
       try {
         emailSent = await emailService.sendOTPEmail(sanitizedIdentifier, verificationCode, false);

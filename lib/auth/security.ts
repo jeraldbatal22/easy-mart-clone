@@ -4,9 +4,24 @@ import { verifyToken } from "../auth";
 // Rate limiting store (in production, use Redis or similar)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
+// Clean up expired entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, record] of rateLimitStore.entries()) {
+    if (now > record.resetTime) {
+      rateLimitStore.delete(key);
+    }
+  }
+}, 5 * 60 * 1000); // Clean up every 5 minutes
+
 export function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
   const realIP = request.headers.get("x-real-ip");
+  const cfConnectingIP = request.headers.get("cf-connecting-ip");
+  
+  if (cfConnectingIP) {
+    return cfConnectingIP;
+  }
   
   if (forwarded) {
     return forwarded.split(",")[0].trim();
@@ -22,7 +37,7 @@ export function getClientIP(request: NextRequest): string {
 export function checkRateLimit(
   identifier: string,
   maxRequests: number = 5,
-  windowMs: number = 1 * 60 * 1000 // 15 minutes
+  windowMs: number = 1 * 60 * 1000 // 1 minute default
 ): boolean {
   const now = Date.now();
   const key = `rate_limit:${identifier}`;
@@ -39,6 +54,27 @@ export function checkRateLimit(
 
   record.count++;
   return true;
+}
+
+export function getRateLimitInfo(identifier: string): { count: number; resetTime: number; remaining: number } | null {
+  const key = `rate_limit:${identifier}`;
+  const record = rateLimitStore.get(key);
+  
+  if (!record) {
+    return null;
+  }
+  
+  const now = Date.now();
+  if (now > record.resetTime) {
+    rateLimitStore.delete(key);
+    return null;
+  }
+  
+  return {
+    count: record.count,
+    resetTime: record.resetTime,
+    remaining: Math.max(0, record.resetTime - now)
+  };
 }
 
 export function addSecurityHeaders(response: NextResponse): NextResponse {
