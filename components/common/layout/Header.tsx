@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useCart } from "@/lib/hooks/useCart";
 import { useClientOnly } from "@/lib/hooks/useClientOnly";
 import { logout } from "@/lib/slices/authSlice";
 import { clearAuthCookies } from "@/lib/utils/cookies";
@@ -15,6 +16,7 @@ export const Header = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { isAuthenticated } = useAuth();
+  const { items } = useCart();
   const isClient = useClientOnly();
 
   return (
@@ -54,11 +56,14 @@ export const Header = () => {
 
           {/* Cart & Login */}
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-gray-600 cursor-pointer hover:text-primary-600 transition-colors">
+            <div
+              onClick={() => router.push("/my-cart")}
+              className="flex items-center space-x-2 text-gray-600 cursor-pointer hover:text-primary-600 transition-colors"
+            >
               <div className="relative">
                 <ShoppingCart className="w-6 h-6" />
                 <span className="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  14
+                  {items?.length}
                 </span>
               </div>
               <span className="hidden sm:block text-sm font-medium">Cart</span>
