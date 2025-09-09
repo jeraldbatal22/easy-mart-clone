@@ -17,6 +17,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // Mock data for recommendations
 const recommendations = [
@@ -59,6 +60,7 @@ const recommendations = [
 ];
 
 export default function CartPage() {
+  const router = useRouter();
   const {
     cart,
     loading,
@@ -250,7 +252,8 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                <Button 
+                <Button
+                  onClick={() => router.push("/checkout")}
                   className="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 sm:py-4 rounded-full flex items-center justify-between mt-4 sm:mt-6 touch-manipulation text-base font-semibold"
                   disabled={items.length === 0}
                 >

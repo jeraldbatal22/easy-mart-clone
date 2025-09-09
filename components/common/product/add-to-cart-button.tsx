@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/hooks/useCart";
 import { ShoppingCart, Plus, Minus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface AddToCartButtonProps {
   productId: string;
@@ -17,7 +18,7 @@ interface AddToCartButtonProps {
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg" | "icon";
   showQuantity?: boolean;
-  quantityProps? : number
+  quantityProps?: number;
 }
 
 export const AddToCartButton = ({
@@ -35,13 +36,13 @@ export const AddToCartButton = ({
   quantityProps = 1,
 }: AddToCartButtonProps) => {
   const [isAdding, setIsAdding] = useState(false);
-  const { 
-    addItemToCart, 
-    incrementQuantity, 
-    decrementQuantity, 
-    getItemQuantity, 
+  const {
+    addItemToCart,
+    incrementQuantity,
+    decrementQuantity,
+    getItemQuantity,
     isItemInCart,
-    loading 
+    loading,
   } = useCart();
 
   const quantity = getItemQuantity(productId);
@@ -50,7 +51,6 @@ export const AddToCartButton = ({
 
   const handleAddToCart = async () => {
     if (isOutOfStock || loading || isAdding) return;
-    console.log('HAHAHA')
 
     setIsAdding(true);
     try {
@@ -63,7 +63,17 @@ export const AddToCartButton = ({
         unit,
         image,
       });
-    } catch (error) {
+      toast.success("Success", {
+        richColors: true,
+        position: "top-right",
+        description: <span>Add to cart successfully</span>,
+      });
+    } catch (error: any) {
+      toast.error("Success", {
+        richColors: true,
+        position: "top-right",
+        description: error.message || "Failed to add to cart:",
+      });
       console.error("Failed to add to cart:", error);
     } finally {
       setIsAdding(false);
@@ -72,7 +82,7 @@ export const AddToCartButton = ({
 
   const handleIncrement = async () => {
     if (isOutOfStock || loading) return;
-    
+
     try {
       await incrementQuantity(productId);
     } catch (error) {
@@ -82,7 +92,7 @@ export const AddToCartButton = ({
 
   const handleDecrement = async () => {
     if (loading) return;
-    
+
     try {
       await decrementQuantity(productId);
     } catch (error) {
@@ -116,9 +126,9 @@ export const AddToCartButton = ({
         >
           <Minus className="w-4 h-4" />
         </Button>
-        
+
         <span className="w-8 text-center font-medium">{quantity}</span>
-        
+
         <Button
           variant="outline"
           size="icon"

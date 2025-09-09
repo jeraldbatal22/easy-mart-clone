@@ -30,74 +30,80 @@ export const Footer = () => {
 
   return (
     <footer className="bg-white border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* Mobile Layout */}
+        <div className="block md:hidden">
           {/* Logo */}
-          <Image src="/assets/icons/logo.png" alt="logo" height={50} width={50}/>
-
-          {/* About */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">About</h3>
-            <ul className="space-y-2">
-              {footerLinks.about.map((link) => (
-                <li key={link.name}>
-                  <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className="mb-6">
+            <Image src="/assets/icons/logo.png" alt="logo" height={40} width={40}/>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              {footerLinks.quickLinks.map((link) => (
-                <li key={link.name}>
-                  <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Links Grid */}
+          <div className="grid grid-cols-2 gap-6 mb-8">
+            {/* About */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3 text-sm">About</h3>
+              <ul className="space-y-2">
+                {footerLinks.about.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Help & Support */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Help & Support</h3>
-            <ul className="space-y-2">
-              {footerLinks.helpSupport.map((link) => (
-                <li key={link.name}>
-                  <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3 text-sm">Quick Links</h3>
+              <ul className="space-y-2">
+                {footerLinks.quickLinks.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Company */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Company</h3>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.name}>
-                  <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            {/* Help & Support */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3 text-sm">Help & Support</h3>
+              <ul className="space-y-2">
+                {footerLinks.helpSupport.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3 text-sm">Company</h3>
+              <ul className="space-y-2">
+                {footerLinks.company.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/* Social */}
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-4">Social</h3>
+          <div className="mb-6">
+            <h3 className="font-semibold text-gray-900 mb-3 text-sm">Social</h3>
             <ul className="space-y-2">
               {footerLinks.social.map((link) => (
                 <li key={link.name}>
-                  <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
+                  <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
                     {link.name}
                   </a>
                 </li>
@@ -106,9 +112,87 @@ export const Footer = () => {
           </div>
         </div>
 
+        {/* Desktop Layout */}
+        <div className="hidden md:block">
+          <div className="grid grid-cols-6 gap-8">
+            {/* Logo */}
+            <Image src="/assets/icons/logo.png" alt="logo" height={50} width={50}/>
+
+            {/* About */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">About</h3>
+              <ul className="space-y-2">
+                {footerLinks.about.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                {footerLinks.quickLinks.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Help & Support */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Help & Support</h3>
+              <ul className="space-y-2">
+                {footerLinks.helpSupport.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Company</h3>
+              <ul className="space-y-2">
+                {footerLinks.company.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Social */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Social</h3>
+              <ul className="space-y-2">
+                {footerLinks.social.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
         {/* Copyright */}
-        <div className="border-t border-gray-200 mt-8 pt-8 text-center">
-          <p className="text-gray-600 text-sm">
+        <div className="border-t border-gray-200 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center">
+          <p className="text-gray-600 text-xs sm:text-sm">
             All rights reserved © 2024 Emastudio
           </p>
         </div>
