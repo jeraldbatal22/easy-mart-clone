@@ -1,4 +1,4 @@
-import { CartItem } from "@/lib/api/cartApi";
+// import { CartItem } from "@/lib/api/cartApi";
 
 export interface GuestCartItem {
   productId: string;
