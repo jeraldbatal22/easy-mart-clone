@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "@/lib/store";
+import { useSelector } from "react-redux";
 import {
   fetchCart,
   addToCart,
@@ -25,9 +24,10 @@ import {
 import { AddToCartRequest, UpdateCartItemRequest } from "@/lib/api/cartApi";
 import { useAuth } from "./useAuth";
 import { useClientOnly } from "./useClientOnly";
+import { useAppDispatch } from "../hooks";
 
 export const useCart = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
 
   // Selectors
   const cart = useSelector(selectCart);

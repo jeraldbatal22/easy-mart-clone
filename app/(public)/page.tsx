@@ -6,7 +6,7 @@ import {
   CategoryNavigation,
   ProductSection,
   // PromotionalBanner,
-  // Header,
+  Header,
   Footer,
 } from "@/app/(public)/_components";
 
@@ -172,7 +172,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* <Header /> */}
+      <Header />
 
       <main>
         <HeroBanner />

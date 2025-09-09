@@ -21,9 +21,8 @@ const initialState: CartState = {
 // Async thunks
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
-  async (payload, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      console.log(payload)
       const response = await cartApi.getCart();
       if (response.success && response.data) {
         return response.data;
@@ -87,8 +86,7 @@ export const removeFromCart = createAsyncThunk(
 
 export const clearCart = createAsyncThunk(
   "cart/clearCart",
-  async (payload, { rejectWithValue }) => {
-    console.log(payload)
+  async (_, { rejectWithValue }) => {
     try {
       const response = await cartApi.clearCart();
       if (response.success && response.data) {
@@ -136,8 +134,7 @@ export const decreaseQuantity = createAsyncThunk(
 
 export const mergeGuestCart = createAsyncThunk(
   "cart/mergeGuestCart",
-  async (payload, { rejectWithValue }) => {
-    console.log(payload)
+  async (_, { rejectWithValue }) => {
     try {
       const guestCart = getGuestCart();
       if (guestCart.items.length === 0) {
@@ -179,8 +176,7 @@ export const setAuthenticationStatus = createAsyncThunk(
 
 export const loadGuestCart = createAsyncThunk(
   "cart/loadGuestCart",
-  async (payload, { rejectWithValue }) => {
-    console.log(payload)
+  async (_, { rejectWithValue }) => {
     try {
       const response = await cartApi.getCart();
       if (response.success && response.data) {
