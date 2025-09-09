@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Cart } from "@/lib/api/cartApi";
+import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
+import type { Cart, CartItem } from "@/lib/api/cartApi";
 import { addToCart, clearCart, decreaseQuantity, fetchCart, increaseQuantity, loadGuestCart, mergeGuestCart, removeFromCart, setAuthenticationStatus, updateCartItem } from "./action";
 
 interface CartState {
@@ -210,7 +210,12 @@ export const { clearError, clearCartState, setCart, setAuthenticationStatus: set
 export const selectCart = (state: { cart: CartState }) => state.cart.cart;
 export const selectCartLoading = (state: { cart: CartState }) => state.cart.loading;
 export const selectCartError = (state: { cart: CartState }) => state.cart.error;
-export const selectCartItems = (state: { cart: CartState }) => state.cart.cart?.items || [];
+// Use a shared empty array to avoid returning a new reference each time
+const EMPTY_ITEMS: CartItem[] = [];
+export const selectCartItems = createSelector(
+  [(state: { cart: CartState }) => state.cart.cart?.items],
+  (items) => items ?? EMPTY_ITEMS
+);
 export const selectCartTotalItems = (state: { cart: CartState }) => state.cart.cart?.totalItems || 0;
 export const selectCartTotalAmount = (state: { cart: CartState }) => state.cart.cart?.totalAmount || 0;
 export const selectCartSubtotal = (state: { cart: CartState }) => state.cart.cart?.subtotal || 0;

@@ -8,7 +8,7 @@ import {
   // PromotionalBanner,
   Header,
   Footer,
-} from "@/app/(public)/_components";
+} from "./_components";
 
 interface UIProduct {
   id: string;

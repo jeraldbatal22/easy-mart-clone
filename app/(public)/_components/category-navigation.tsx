@@ -6,6 +6,7 @@ import { LoadingSkeleton } from "../../../components/common/LoadingSpinner";
 import { ErrorBoundary } from "../../../components/common/ErrorBoundary";
 import Image from "next/image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import useDeviceDetect from "@/lib/hooks/useDeviceDetect";
 
 interface Category {
   id: string;
@@ -30,6 +31,7 @@ export const CategoryNavigation = ({
   const [fetchedCategories, setFetchedCategories] = useState<Category[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
+  const { isMobile } = useDeviceDetect();
 
   useEffect(() => {
     let isCancelled = false;
@@ -67,15 +69,15 @@ export const CategoryNavigation = ({
 
   if (isLoadingCategories) {
     return (
-      <section className="py-6 px-8 w-full">
-        <LoadingSkeleton lines={2} itemClassName="h-10 w-32 rounded-full" className="flex"/>
+      <section className="!pt-6 md:py-6 px-8 w-full">
+        <LoadingSkeleton lines={2} columns={isMobile ? 2 : 5} itemClassName="h-10 w-32 rounded-full" className="flex"/>
       </section>
     );
   }
 
   return (
     <ErrorBoundary>
-      <section className="py-6">
+      <section className="pt-6 md:py-6">
         {categoriesError && (
           <Alert variant="destructive">
             <AlertDescription>{categoriesError}</AlertDescription>

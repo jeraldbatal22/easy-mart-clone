@@ -1,7 +1,11 @@
 import axios from 'axios';
-import { store } from './store';
-import { logout } from './slices/authSlice';
 import { getAuthCookies, clearAuthCookies } from './utils/cookies';
+
+// Optional store attachment to avoid circular imports
+let attachedStore: { getState: () => any; dispatch: (action: any) => any } | null = null;
+export const attachStore = (store: { getState: () => any; dispatch: (action: any) => any }) => {
+  attachedStore = store;
+};
 
 // Create axios instance
 const api = axios.create({
@@ -13,13 +17,20 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Try to get token from Redux store first, then from cookies
-    const state = store.getState();
-    let token = state.auth.token;
+    let token: string | undefined;
+    try {
+      if (attachedStore) {
+        const state = attachedStore.getState();
+        token = state?.auth?.token;
+      }
+    } catch {
+      // ignore
+    }
     
     if (!token && typeof window !== 'undefined') {
       // Fallback to cookies if Redux state is empty
       const cookies = getAuthCookies();
-      token = cookies.token;
+      token = cookies.token || undefined;
     }
     
     if (token) {
@@ -41,7 +52,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid, logout user
-      store.dispatch(logout());
+      if (attachedStore) {
+        // Dispatch logout by action type to avoid importing slice here
+        attachedStore.dispatch({ type: 'auth/logout' });
+      }
       
       // Clear cookies
       if (typeof window !== 'undefined') {

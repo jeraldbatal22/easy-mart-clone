@@ -3,6 +3,7 @@ import { combineReducers } from '@reduxjs/toolkit';
 import { authApi } from './api/authApi';
 import authSlice from './slices/authSlice';
 import cartSlice from './slices/cart/reducer';
+import { attachStore } from './axios';
 
 // Root reducer
 const rootReducer = combineReducers({
@@ -22,6 +23,9 @@ export const store = configureStore({
     }).concat(authApi.middleware),
   devTools: process.env.NODE_ENV !== 'production',
 });
+
+// Attach store to axios lazily to avoid circular imports
+attachStore(store);
 
 // Types
 export type RootState = ReturnType<typeof store.getState>;

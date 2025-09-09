@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 
 import { AddToCartRequest, UpdateCartItemRequest } from "@/lib/api/cartApi";
 import { useAuth } from "./useAuth";
 import { useClientOnly } from "./useClientOnly";
-import { useAppDispatch } from "../hooks";
+import { useAppDispatch, useAppSelector } from "../hooks";
 import {
   clearError,
   selectCart,
@@ -33,14 +33,14 @@ export const useCart = () => {
   const dispatch = useAppDispatch();
 
   // Selectors
-  const cart = useSelector(selectCart);
-  const loading = useSelector(selectCartLoading);
-  const error = useSelector(selectCartError);
-  const items = useSelector(selectCartItems);
-  const totalItems = useSelector(selectCartTotalItems);
-  const totalAmount = useSelector(selectCartTotalAmount);
-  const subtotal = useSelector(selectCartSubtotal);
-  const deliveryFee = useSelector(selectCartDeliveryFee);
+  const cart = useAppSelector(selectCart);
+  const loading = useAppSelector(selectCartLoading);
+  const error = useAppSelector(selectCartError);
+  const items = useAppSelector(selectCartItems);
+  const totalItems = useAppSelector(selectCartTotalItems);
+  const totalAmount = useAppSelector(selectCartTotalAmount);
+  const subtotal = useAppSelector(selectCartSubtotal);
+  const deliveryFee = useAppSelector(selectCartDeliveryFee);
   // const isAuthenticatedCart = useSelector(selectIsAuthenticated);
   const { isAuthenticated } = useAuth();
   const isClient = useClientOnly();

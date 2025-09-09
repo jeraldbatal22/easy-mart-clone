@@ -17,6 +17,7 @@ import {
 import { LoadingSkeleton } from "@/components/common/LoadingSpinner";
 import { AddToCartButton } from "@/components/common/product/add-to-cart-button";
 import { useCart } from "@/lib/hooks/useCart";
+import useDeviceDetect from "@/lib/hooks/useDeviceDetect";
 
 type UIProduct = {
   id: string;
@@ -42,15 +43,8 @@ const ProductViewPage = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [images, setImages] = useState<string[]>([]);
   const [activeImageIdx, setActiveImageIdx] = useState<number>(0);
-  const {
-    // addItemToCart,
-    // incrementQuantity,
-    // decrementQuantity,
-    // getItemQuantity,
-    isItemInCart,
-    items,
-  } = useCart();
-  console.log(items)
+  const { isMobile } = useDeviceDetect();
+  const { isItemInCart } = useCart();
 
   useEffect(() => {
     let isCancelled = false;
@@ -129,7 +123,7 @@ const ProductViewPage = () => {
 
   const handleDecrease = () => setQuantity((q) => Math.max(1, q - 1));
   const handleIncrease = () => setQuantity((q) => q + 1);
-  console.log(product);
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -158,9 +152,9 @@ const ProductViewPage = () => {
 
         {isLoading ? (
           <div className="space-y-6">
-            <LoadingSkeleton lines={1} columns={2} itemClassName="h-96" />
-            <LoadingSkeleton lines={1} columns={2} itemClassName="h-32" />
-            <LoadingSkeleton lines={1} columns={3} itemClassName="h-32" />
+            <LoadingSkeleton lines={1} columns={isMobile ? 1 : 2} itemClassName="h-96" />
+            <LoadingSkeleton lines={1} columns={isMobile ? 1 : 2} itemClassName="h-32" />
+            <LoadingSkeleton lines={1} columns={isMobile ? 2 : 3} itemClassName="h-32" />
           </div>
         ) : error ? (
           <div className="max-w-xl mx-auto bg-red-50 text-red-700 border border-red-200 rounded-lg p-4">

@@ -8,6 +8,7 @@ import {
   LoadingSkeleton,
 } from "@/components/common/LoadingSpinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import useDeviceDetect from "../../../lib/hooks/useDeviceDetect";
 
 interface ProductSectionProps {
   isLoading: boolean;
@@ -62,12 +63,13 @@ export const ProductSection = ({
 }: ProductSectionProps) => {
   const hasNextPage = pagination?.hasNextPage ?? false;
   const hasPrevPage = pagination?.hasPrevPage ?? false;
-
+  const { isMobile } = useDeviceDetect();
+  
   if (isLoading) {
     return (
       <section className="py-8 px-8 w-full">
         <div className="animate-pulse bg-gray-200 rounded-lg h-10 my-3 w-32"/>
-        <LoadingSkeleton lines={1} itemClassName="h-40 xs:h-48 sm:h-60 "/>
+        <LoadingSkeleton lines={1} columns={isMobile ? 2 : 5} itemClassName="h-40 xs:h-48 sm:h-60 "/>
       </section>
     );
   }

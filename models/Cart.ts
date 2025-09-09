@@ -141,7 +141,7 @@ cartSchema.set("toJSON", { virtuals: true });
 cartSchema.set("toObject", { virtuals: true });
 
 // Indexes for better query performance
-cartSchema.index({ user: 1 });
+// cartSchema.index({ user: 1 });
 cartSchema.index({ isActive: 1 });
 cartSchema.index({ expiresAt: 1 });
 cartSchema.index({ createdAt: -1 });
