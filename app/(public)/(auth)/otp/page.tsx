@@ -12,12 +12,12 @@ interface OtpPageProps {
 export default async function OtpPage({
   searchParams,
 }: {
-  searchParams:
-    | OtpPageProps["searchParams"]
-    | Promise<OtpPageProps["searchParams"]>;
+  searchParams?: Promise<any>;
 }) {
-  const resolvedSearchParams = await Promise.resolve(searchParams);
-  const { type, identifier } = resolvedSearchParams;
+  const resolvedSearchParams = (await Promise.resolve(searchParams)) as
+    | OtpPageProps["searchParams"]
+    | undefined;
+  const { type, identifier } = (resolvedSearchParams ?? {}) as OtpPageProps["searchParams"];
 
   // Validate required parameters
   if (!type || !identifier) {
