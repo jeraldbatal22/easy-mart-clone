@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export const Footer = () => {
   const footerLinks = {
     about: [
@@ -31,17 +33,7 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
           {/* Logo */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-sm flex flex-col justify-between p-0.5">
-                  <div className="w-full h-0.5 bg-purple-600 rounded"></div>
-                  <div className="w-3/4 h-0.5 bg-purple-600 rounded"></div>
-                  <div className="w-1/2 h-0.5 bg-purple-600 rounded"></div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Image src="/assets/icons/logo.png" alt="logo" height={50} width={50}/>
 
           {/* About */}
           <div>

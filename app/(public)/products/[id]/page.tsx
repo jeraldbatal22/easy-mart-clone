@@ -28,6 +28,8 @@ type UIProduct = {
   unit: string;
   stock: string;
   description?: string;
+  isVerified?: boolean;
+  isBestSeller?: boolean;
 };
 
 const fallbackImage = "/assets/images/product/product-1.png";
@@ -121,8 +123,16 @@ const ProductViewPage = () => {
     };
   }, [productId]);
 
+  const isMaximumQuantity: boolean = useMemo(
+    () => Number(quantity) >= Number(product?.stock),
+    [quantity, product?.stock]
+  );
+
   const handleDecrease = () => setQuantity((q) => Math.max(1, q - 1));
-  const handleIncrease = () => setQuantity((q) => q + 1);
+  const handleIncrease = () => {
+    if (isMaximumQuantity) return;
+    setQuantity((q) => q + 1);
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -152,9 +162,21 @@ const ProductViewPage = () => {
 
         {isLoading ? (
           <div className="space-y-6">
-            <LoadingSkeleton lines={1} columns={isMobile ? 1 : 2} itemClassName="h-96" />
-            <LoadingSkeleton lines={1} columns={isMobile ? 1 : 2} itemClassName="h-32" />
-            <LoadingSkeleton lines={1} columns={isMobile ? 2 : 3} itemClassName="h-32" />
+            <LoadingSkeleton
+              lines={1}
+              columns={isMobile ? 1 : 2}
+              itemClassName="h-96"
+            />
+            <LoadingSkeleton
+              lines={1}
+              columns={isMobile ? 1 : 2}
+              itemClassName="h-32"
+            />
+            <LoadingSkeleton
+              lines={1}
+              columns={isMobile ? 2 : 3}
+              itemClassName="h-32"
+            />
           </div>
         ) : error ? (
           <div className="max-w-xl mx-auto bg-red-50 text-red-700 border border-red-200 rounded-lg p-4">
@@ -211,12 +233,16 @@ const ProductViewPage = () => {
               <div className="flex flex-col gap-4 sm:gap-6">
                 {/* Badges */}
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 text-xs">
-                    <BadgeCheck className="h-3.5 w-3.5" /> Verified
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 text-primary-700 border border-primary-200 px-2.5 py-1 text-xs">
-                    Best Seller
-                  </span>
+                  {product.isVerified && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-50 text-green-700 border border-green-200 px-2.5 py-1 text-xs">
+                      <BadgeCheck className="h-3.5 w-3.5" /> Verified
+                    </span>
+                  )}
+                  {product.isBestSeller && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 text-primary-700 border border-primary-200 px-2.5 py-1 text-xs">
+                      Best Seller
+                    </span>
+                  )}
                 </div>
 
                 <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">
@@ -252,7 +278,7 @@ const ProductViewPage = () => {
                 <div className="text-sm text-gray-600">{product.unit}</div>
                 {product.stock && (
                   <div className="text-sm font-medium text-primary-600">
-                    {product.stock}
+                    {product.stock} Left
                   </div>
                 )}
 
@@ -272,14 +298,16 @@ const ProductViewPage = () => {
                         <div className="px-4 py-2 min-w-10 text-center text-gray-900">
                           {quantity}
                         </div>
-                        <button
+                        <Button
+                          variant="ghost"
                           type="button"
+                          disabled={isMaximumQuantity}
                           onClick={handleIncrease}
                           className="px-3 py-2 text-gray-700 hover:bg-gray-50"
                           aria-label="Increase quantity"
                         >
                           +
-                        </button>
+                        </Button>
                       </div>
                       <AddToCartButton
                         productId={product.id}

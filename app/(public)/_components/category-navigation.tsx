@@ -69,7 +69,7 @@ export const CategoryNavigation = ({
 
   if (isLoadingCategories) {
     return (
-      <section className="!pt-6 md:py-6 px-8 w-full">
+      <section className="!pt-6 md:pb-0 px-8 w-full">
         <LoadingSkeleton lines={2} columns={isMobile ? 2 : 5} itemClassName="h-10 w-32 rounded-full" className="flex"/>
       </section>
     );
@@ -77,7 +77,7 @@ export const CategoryNavigation = ({
 
   return (
     <ErrorBoundary>
-      <section className="pt-6 md:py-6">
+      <section className="pt-6 md:pb-0">
         {categoriesError && (
           <Alert variant="destructive">
             <AlertDescription>{categoriesError}</AlertDescription>

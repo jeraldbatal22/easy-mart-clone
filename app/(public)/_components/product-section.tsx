@@ -1,12 +1,10 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, EqualApproximately } from "lucide-react";
 import { FreshnessGuaranteeCard } from "./freshness-guarantee-card";
 import { Button } from "../../../components/ui/button";
 import { ProductCard } from "../../../components/common/product/product-card";
-import {
-  LoadingSkeleton,
-} from "@/components/common/LoadingSpinner";
+import { LoadingSkeleton } from "@/components/common/LoadingSpinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import useDeviceDetect from "../../../lib/hooks/useDeviceDetect";
 
@@ -64,12 +62,16 @@ export const ProductSection = ({
   const hasNextPage = pagination?.hasNextPage ?? false;
   const hasPrevPage = pagination?.hasPrevPage ?? false;
   const { isMobile } = useDeviceDetect();
-  
+
   if (isLoading) {
     return (
       <section className="py-8 px-8 w-full">
-        <div className="animate-pulse bg-gray-200 rounded-lg h-10 my-3 w-32"/>
-        <LoadingSkeleton lines={1} columns={isMobile ? 2 : 5} itemClassName="h-40 xs:h-48 sm:h-60 "/>
+        <div className="animate-pulse bg-gray-200 rounded-lg h-10 my-3 w-32" />
+        <LoadingSkeleton
+          lines={1}
+          columns={isMobile ? 2 : 5}
+          itemClassName="h-40 xs:h-48 sm:h-60 "
+        />
       </section>
     );
   }
@@ -96,7 +98,11 @@ export const ProductSection = ({
                 </Button>
               )}
               <button
-                className={`text-gray-400 transition-colors ${hasPrevPage && !isLoading ? "hover:text-gray-600" : "opacity-40 cursor-not-allowed"}`}
+                className={`text-gray-400 transition-colors ${
+                  hasPrevPage && !isLoading
+                    ? "hover:text-gray-600"
+                    : "opacity-40 cursor-not-allowed"
+                }`}
                 onClick={hasPrevPage && !isLoading ? onPrevPage : undefined}
                 aria-disabled={!hasPrevPage || isLoading}
                 disabled={!hasPrevPage || isLoading}
@@ -104,7 +110,11 @@ export const ProductSection = ({
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
-                className={`text-gray-400 transition-colors ${hasNextPage && !isLoading ? "hover:text-gray-600" : "opacity-40 cursor-not-allowed"}`}
+                className={`text-gray-400 transition-colors ${
+                  hasNextPage && !isLoading
+                    ? "hover:text-gray-600"
+                    : "opacity-40 cursor-not-allowed"
+                }`}
                 onClick={hasNextPage && !isLoading ? onNextPage : undefined}
                 aria-disabled={!hasNextPage || isLoading}
                 disabled={!hasNextPage || isLoading}
@@ -141,8 +151,15 @@ export const ProductSection = ({
         )}
 
         {/* Products Grid */}
+          {products.length === 0 && (
+            <div className="text-center flex flex-col justify-center items-center py-12">
+              <EqualApproximately className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No Product Avaialble for <span className="text-primary-500">{selectedCategory}</span>
+              </h3>
+            </div>
+          )}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-          {products.length === 0 && <div>No Product Avaialble for {selectedCategory}</div>}
           {products.map((product) => (
             <ProductCard key={product.id} {...product} />
           ))}
