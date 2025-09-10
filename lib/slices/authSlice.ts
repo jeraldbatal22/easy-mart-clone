@@ -7,6 +7,8 @@ export interface User {
   phone: string;
   isVerified: boolean;
   verifiedAt?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export interface AuthState {

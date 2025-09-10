@@ -8,23 +8,25 @@ import { clearAuthCookies } from "@/lib/utils/cookies";
 import {
   User,
   FileText,
-  MapPin,
-  CreditCard,
-  Bell,
-  Tag,
-  ChefHat,
-  Settings,
-  HelpCircle,
+  // MapPin,
+  // CreditCard,
+  // Bell,
+  // Tag,
+  // ChefHat,
+  // Settings,
+  // HelpCircle,
   LogOut,
   ShoppingCart,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { usePathname } from "next/navigation";
+import { useAppSelector } from "@/lib/hooks";
 
 const SidebarAccount = () => {
+  const { user } = useAppSelector((state) => state.auth);
   const dispatch = useDispatch();
   const pathname = usePathname();
-  
+
   const navigationItems = [
     {
       icon: User,
@@ -32,18 +34,18 @@ const SidebarAccount = () => {
       href: "/account/details",
     },
     { icon: FileText, label: "My Orders", href: "/account/orders" },
-    { icon: ShoppingCart, label: "My Cart", href: "/my-cart" },
-    { icon: MapPin, label: "My Addresses", href: "/account/addresses" },
-    { icon: CreditCard, label: "My Payments", href: "/account/payments" },
-    {
-      icon: Bell,
-      label: "Notification Setting",
-      href: "/account/notifications",
-    },
-    { icon: Tag, label: "Coupons", href: "/account/coupons" },
-    { icon: ChefHat, label: "My Recipes", href: "/account/recipes" },
-    { icon: Settings, label: "Account Settings", href: "/account/settings" },
-    { icon: HelpCircle, label: "Help Center", href: "/account/help" },
+    { icon: ShoppingCart, label: "My Cart", href: "/account/my-cart" },
+    // { icon: MapPin, label: "My Addresses", href: "/account/addresses" },
+    // { icon: CreditCard, label: "My Payments", href: "/account/payments" },
+    // {
+    //   icon: Bell,
+    //   label: "Notification Setting",
+    //   href: "/account/notifications",
+    // },
+    // { icon: Tag, label: "Coupons", href: "/account/coupons" },
+    // { icon: ChefHat, label: "My Recipes", href: "/account/recipes" },
+    // { icon: Settings, label: "Account Settings", href: "/account/settings" },
+    // { icon: HelpCircle, label: "Help Center", href: "/account/help" },
   ];
 
   return (
@@ -57,7 +59,9 @@ const SidebarAccount = () => {
               <User className="w-6 h-6 text-primary-500" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">Alicii Virgo</h3>
+              <h3 className="text-sm font-semibold text-gray-900">
+                {user?.firstName ? user?.firstName : user?.email}
+              </h3>
               <p className="text-xs text-gray-500">Account Settings</p>
             </div>
           </div>
@@ -80,12 +84,14 @@ const SidebarAccount = () => {
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="text-center leading-tight">{item.label}</span>
+                  <span className="text-center leading-tight">
+                    {item.label}
+                  </span>
                 </Link>
               );
             })}
           </div>
-          
+
           {/* Logout Button - Mobile */}
           <div className="mt-4 pt-4 border-t border-gray-100">
             <Button
@@ -113,7 +119,7 @@ const SidebarAccount = () => {
               <User className="w-10 h-10 text-primary-500" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
-              Alicii Virgo
+              {user?.firstName ? user?.firstName : user?.email}
             </h3>
           </div>
 

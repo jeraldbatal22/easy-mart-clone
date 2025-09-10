@@ -121,7 +121,7 @@ export default function OtpForm({ identifier, type }: OtpFormProps) {
 
       {/* Success Alert */}
       {success && (
-        <Alert className="mt-4" variant="default">
+        <Alert className="mt-4 border-1 border-green-700" variant="default">
           <AlertDescription className="text-green-700">
             {success}
           </AlertDescription>

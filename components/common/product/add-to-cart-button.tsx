@@ -65,13 +65,13 @@ export const AddToCartButton = ({
       });
       toast.success("Success", {
         richColors: true,
-        position: "top-right",
+        position: "top-center",
         description: <span>Add to cart successfully</span>,
       });
     } catch (error: any) {
       toast.error("Success", {
         richColors: true,
-        position: "top-right",
+        position: "top-center",
         description: error.message || "Failed to add to cart:",
       });
       console.error("Failed to add to cart:", error);

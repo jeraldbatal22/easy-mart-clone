@@ -21,6 +21,10 @@ const userSchema = new Schema(
     isVerified: { type: Boolean, default: false },
     verifiedAt: { type: Date, default: null },
 
+    // New fields for names
+    firstName: { type: String, default: null },
+    lastName: { type: String, default: null },
+
     // Relations (assuming VerificationCode and RefreshToken are other models)
     verificationCodes: [
       { type: Types.ObjectId, ref: "VerificationCode", default: [] },
@@ -36,6 +40,17 @@ const userSchema = new Schema(
 userSchema.virtual("id").get(function () {
   return this._id.toHexString();
 });
+
+// Add a virtual for fullName
+userSchema.virtual("fullName").get(function () {
+  if (this.firstName && this.lastName) {
+    return `${this.firstName} ${this.lastName}`;
+  }
+  if (this.firstName) return this.firstName;
+  if (this.lastName) return this.lastName;
+  return "";
+});
+
 userSchema.set("toJSON", { virtuals: true });
 userSchema.set("toObject", { virtuals: true });
 
