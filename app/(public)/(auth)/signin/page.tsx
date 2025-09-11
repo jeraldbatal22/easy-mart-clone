@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { signinAction } from "./actions";
+import { toast } from "sonner";
 
 type SigninMethod = "email" | "phone";
 
@@ -32,6 +33,23 @@ export default function SigninPage() {
   const [error, setError] = useState<string>("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check for token expiration reason and show toast
+  useEffect(() => {
+    const reason = searchParams.get("reason");
+    if (reason === "token_expired") {
+      toast.error("Session expired", {
+        description: "Your session has expired. Please sign in again.",
+        duration: 5000,
+      });
+    } else if (reason === "invalid_token") {
+      toast.error("Invalid session", {
+        description: "Your session is invalid. Please sign in again.",
+        duration: 5000,
+      });
+    }
+  }, [searchParams]);
 
   const emailForm = useForm<EmailForm>({
     resolver: zodResolver(emailSchema),

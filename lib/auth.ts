@@ -14,7 +14,7 @@ export interface TokenPayload {
 }
 
 export function signToken(payload: TokenPayload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "10m" });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "5m" });
 }
 
 export function signRefreshToken(payload: TokenPayload) {

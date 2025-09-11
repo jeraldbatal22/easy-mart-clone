@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import { getAuthCookies, clearAuthCookies } from "./utils/cookies";
+import { toast } from "sonner";
 
 export interface HttpSuccess<T> {
   success: true;
@@ -56,7 +57,13 @@ export class HttpClient {
         const status = (err as AxiosError)?.response?.status;
         if (typeof window !== "undefined" && status === 401) {
           clearAuthCookies();
-          try { window.location.href = "/signin"; } catch {}
+          toast.error("Session expired", {
+            description: "Your session has expired. Please sign in again.",
+            duration: 5000,
+          });
+          try { 
+            window.location.href = "/signin?reason=token_expired"; 
+          } catch {}
         }
         return Promise.reject(err);
       }
