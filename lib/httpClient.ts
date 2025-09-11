@@ -23,7 +23,10 @@ function toFailure(error: unknown): HttpFailure {
   const response = axiosError?.response;
   return {
     success: false,
-    error: (response?.data?.error as string) || axiosError?.message || "Request failed",
+    error:
+      (response?.data?.error as string) ||
+      axiosError?.message ||
+      "Request failed",
     code: (response?.data?.code as string) || undefined,
     details: response?.data?.details,
     status: response?.status,
@@ -33,8 +36,15 @@ function toFailure(error: unknown): HttpFailure {
 export class HttpClient {
   private instance: AxiosInstance;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_URL || "", config?: AxiosRequestConfig) {
-    this.instance = axios.create({ baseURL, timeout: 10000, ...(config || {}) });
+  constructor(
+    baseURL: string = process.env.NEXT_PUBLIC_API_URL || "",
+    config?: AxiosRequestConfig
+  ) {
+    this.instance = axios.create({
+      baseURL,
+      timeout: 10000,
+      ...(config || {}),
+    });
 
     this.instance.interceptors.request.use((cfg) => {
       let token: string | undefined;
@@ -58,11 +68,13 @@ export class HttpClient {
         if (typeof window !== "undefined" && status === 401) {
           clearAuthCookies();
           toast.error("Session expired", {
+            richColors: true,
+            position: "top-center",
             description: "Your session has expired. Please sign in again.",
             duration: 5000,
           });
-          try { 
-            window.location.href = "/signin?reason=token_expired"; 
+          try {
+            window.location.href = "/signin?reason=token_expired";
           } catch {}
         }
         return Promise.reject(err);
@@ -70,45 +82,75 @@ export class HttpClient {
     );
   }
 
-  async get<T>(url: string, config?: AxiosRequestConfig): Promise<HttpResult<T>> {
+  async get<T>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<HttpResult<T>> {
     try {
       const res = await this.instance.get(url, config);
-      return (res.data?.success === false)
+      return res.data?.success === false
         ? toFailure({ response: { ...res, data: res.data } } as any)
-        : { success: true, data: (res.data?.data ?? res.data) as T, message: res.data?.message };
+        : {
+            success: true,
+            data: (res.data?.data ?? res.data) as T,
+            message: res.data?.message,
+          };
     } catch (error) {
       return toFailure(error);
     }
   }
 
-  async post<T>(url: string, body?: any, config?: AxiosRequestConfig): Promise<HttpResult<T>> {
+  async post<T>(
+    url: string,
+    body?: any,
+    config?: AxiosRequestConfig
+  ): Promise<HttpResult<T>> {
     try {
       const res = await this.instance.post(url, body, config);
-      return (res.data?.success === false)
+      return res.data?.success === false
         ? toFailure({ response: { ...res, data: res.data } } as any)
-        : { success: true, data: (res.data?.data ?? res.data) as T, message: res.data?.message };
+        : {
+            success: true,
+            data: (res.data?.data ?? res.data) as T,
+            message: res.data?.message,
+          };
     } catch (error) {
       return toFailure(error);
     }
   }
 
-  async put<T>(url: string, body?: any, config?: AxiosRequestConfig): Promise<HttpResult<T>> {
+  async put<T>(
+    url: string,
+    body?: any,
+    config?: AxiosRequestConfig
+  ): Promise<HttpResult<T>> {
     try {
       const res = await this.instance.put(url, body, config);
-      return (res.data?.success === false)
+      return res.data?.success === false
         ? toFailure({ response: { ...res, data: res.data } } as any)
-        : { success: true, data: (res.data?.data ?? res.data) as T, message: res.data?.message };
+        : {
+            success: true,
+            data: (res.data?.data ?? res.data) as T,
+            message: res.data?.message,
+          };
     } catch (error) {
       return toFailure(error);
     }
   }
 
-  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<HttpResult<T>> {
+  async delete<T>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<HttpResult<T>> {
     try {
       const res = await this.instance.delete(url, config);
-      return (res.data?.success === false)
+      return res.data?.success === false
         ? toFailure({ response: { ...res, data: res.data } } as any)
-        : { success: true, data: (res.data?.data ?? res.data) as T, message: res.data?.message };
+        : {
+            success: true,
+            data: (res.data?.data ?? res.data) as T,
+            message: res.data?.message,
+          };
     } catch (error) {
       return toFailure(error);
     }
@@ -116,5 +158,3 @@ export class HttpClient {
 }
 
 export const httpClient = new HttpClient("");
-
-

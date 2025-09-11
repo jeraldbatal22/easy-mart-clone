@@ -40,11 +40,15 @@ export default function SigninPage() {
     const reason = searchParams.get("reason");
     if (reason === "token_expired") {
       toast.error("Session expired", {
+        richColors: true,
+        position: "top-center",
         description: "Your session has expired. Please sign in again.",
         duration: 5000,
       });
     } else if (reason === "invalid_token") {
       toast.error("Invalid session", {
+        richColors: true,
+        position: "top-center",
         description: "Your session is invalid. Please sign in again.",
         duration: 5000,
       });
