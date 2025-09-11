@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,7 +19,7 @@ export default function AuthLayout({
           />
         </Link>
       </header>
-      {children}
+      <Suspense fallback={null}>{children}</Suspense>
     </div>
   );
 }
