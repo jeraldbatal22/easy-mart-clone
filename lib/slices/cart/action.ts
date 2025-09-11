@@ -11,7 +11,7 @@ export const fetchCart = createAsyncThunk(
       if (response.success && response.data) {
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to fetch cart");
+        return rejectWithValue("Failed to fetch cart");
       }
     } catch (error: any) {
       console.log(error, "error")
@@ -28,7 +28,7 @@ export const addToCart = createAsyncThunk(
       if (response.success && response.data) {
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to add item to cart");
+        return rejectWithValue("Failed to add item to cart");
       }
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to add item to cart");
@@ -44,7 +44,7 @@ export const updateCartItem = createAsyncThunk(
       if (response.success && response.data) {
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to update cart item");
+        return rejectWithValue("Failed to update cart item");
       }
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to update cart item");
@@ -60,7 +60,7 @@ export const removeFromCart = createAsyncThunk(
       if (response.success && response.data) {
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to remove item from cart");
+        return rejectWithValue("Failed to remove item from cart");
       }
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to remove item from cart");
@@ -76,7 +76,7 @@ export const clearCart = createAsyncThunk(
       if (response.success && response.data) {
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to clear cart");
+        return rejectWithValue("Failed to clear cart");
       }
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to clear cart");
@@ -92,7 +92,7 @@ export const increaseQuantity = createAsyncThunk(
       if (response.success && response.data) {
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to increase quantity");
+        return rejectWithValue("Failed to increase quantity");
       }
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to increase quantity");
@@ -108,7 +108,7 @@ export const decreaseQuantity = createAsyncThunk(
       if (response.success && response.data) {
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to decrease quantity");
+        return rejectWithValue("Failed to decrease quantity");
       }
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to decrease quantity");
@@ -133,7 +133,7 @@ export const mergeGuestCart = createAsyncThunk(
         clearGuestCart();
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to merge guest cart");
+        return rejectWithValue("Failed to merge guest cart");
       }
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to merge guest cart");
@@ -166,7 +166,7 @@ export const loadGuestCart = createAsyncThunk(
       if (response.success && response.data) {
         return response.data;
       } else {
-        return rejectWithValue(response.error || "Failed to load guest cart");
+        return rejectWithValue("Failed to load guest cart");
       }
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to load guest cart");
