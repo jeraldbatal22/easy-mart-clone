@@ -6,6 +6,13 @@ export enum AuthProvider {
   // Add other providers as needed
 }
 
+export enum UserRole {
+  ADMIN = "admin",
+  USER = "user",
+  GUEST = "guest",
+  MERCHANT = "merchant",
+}
+
 const userSchema = new Schema(
   {
     // MongoDB will use _id as the primary key, but we can add a virtual 'id' if needed
@@ -24,6 +31,13 @@ const userSchema = new Schema(
     // New fields for names
     firstName: { type: String, default: null },
     lastName: { type: String, default: null },
+
+    // User role
+    role: {
+      type: String,
+      enum: Object.values(UserRole),
+      default: UserRole.USER,
+    },
 
     // Relations (assuming VerificationCode and RefreshToken are other models)
     verificationCodes: [

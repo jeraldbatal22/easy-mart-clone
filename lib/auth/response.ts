@@ -51,6 +51,10 @@ export function createUserResponse(user: any, message: string = "Success") {
       phone: user.phone,
       isVerified: user.isVerified,
       verifiedAt: user.verifiedAt,
+      role: user.role,
+      fullName: user.fullName,
+      firstName: user.firstName,
+      lastName: user.lastName
     },
   };
 }

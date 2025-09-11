@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
       id: user._id.toString(),
       email: user.email,
       phone: user.phone,
+      role: user.role
     });
 
     const response = createSuccessResponse(

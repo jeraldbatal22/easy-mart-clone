@@ -1,4 +1,4 @@
-import axiosInstance from "@/lib/axios";
+import { httpClient, HttpResult } from "@/lib/httpClient";
 import { 
   getGuestCart, 
   addToGuestCart, 
@@ -66,34 +66,18 @@ export interface UpdateCartItemRequest {
   quantity: number;
 }
 
-export interface CartApiResponse {
-  success: boolean;
-  data?: Cart;
-  message?: string;
-  error?: string;
-  code?: string;
-  details?: any;
-}
+export type CartApiResponse = HttpResult<Cart>;
 
 class CartApi {
   private baseUrl = "/api/cart";
-  private isAuthenticated = false; // This should be determined by your auth system
+  private isAuthenticated = false; // Integrate with your auth state externally
 
   /**
    * Get user's cart or guest cart
    */
   async getCart(): Promise<CartApiResponse> {
     if (this.isAuthenticated) {
-      try {
-        const response = await axiosInstance.get(this.baseUrl);
-        return response.data;
-      } catch (error: any) {
-        return {
-          success: false,
-          error: error.response?.data?.error || "Failed to fetch cart",
-          code: error.response?.data?.code || "FETCH_CART_ERROR",
-        };
-      }
+      return await httpClient.get<Cart>(this.baseUrl);
     } else {
       // Return guest cart
       const guestCart = getGuestCart();
@@ -109,17 +93,7 @@ class CartApi {
    */
   async addToCart(data: AddToCartRequest): Promise<CartApiResponse> {
     if (this.isAuthenticated) {
-      try {
-        const response = await axiosInstance.post(this.baseUrl, data);
-        return response.data;
-      } catch (error: any) {
-        return {
-          success: false,
-          error: error.response?.data?.error || "Failed to add item to cart",
-          code: error.response?.data?.code || "ADD_TO_CART_ERROR",
-          details: error.response?.data?.details,
-        };
-      }
+      return await httpClient.post<Cart>(this.baseUrl, data);
     } else {
       // Add to guest cart
       if (!data.productName || !data.price || !data.unit || !data.image) {
@@ -153,17 +127,7 @@ class CartApi {
    */
   async updateCartItem(data: UpdateCartItemRequest): Promise<CartApiResponse> {
     if (this.isAuthenticated) {
-      try {
-        const response = await axiosInstance.put(this.baseUrl, data);
-        return response.data;
-      } catch (error: any) {
-        return {
-          success: false,
-          error: error.response?.data?.error || "Failed to update cart item",
-          code: error.response?.data?.code || "UPDATE_CART_ERROR",
-          details: error.response?.data?.details,
-        };
-      }
+      return await httpClient.put<Cart>(this.baseUrl, data);
     } else {
       // Update guest cart
       const guestCart = updateGuestCartItem(data.productId, data.quantity);
@@ -180,16 +144,7 @@ class CartApi {
    */
   async removeFromCart(productId: string): Promise<CartApiResponse> {
     if (this.isAuthenticated) {
-      try {
-        const response = await axiosInstance.delete(`${this.baseUrl}?productId=${productId}`);
-        return response.data;
-      } catch (error: any) {
-        return {
-          success: false,
-          error: error.response?.data?.error || "Failed to remove item from cart",
-          code: error.response?.data?.code || "REMOVE_FROM_CART_ERROR",
-        };
-      }
+      return await httpClient.delete<Cart>(`${this.baseUrl}?productId=${productId}`);
     } else {
       // Remove from guest cart
       const guestCart = removeFromGuestCart(productId);
@@ -206,16 +161,7 @@ class CartApi {
    */
   async clearCart(): Promise<CartApiResponse> {
     if (this.isAuthenticated) {
-      try {
-        const response = await axiosInstance.delete(`${this.baseUrl}?clearAll=true`);
-        return response.data;
-      } catch (error: any) {
-        return {
-          success: false,
-          error: error.response?.data?.error || "Failed to clear cart",
-          code: error.response?.data?.code || "CLEAR_CART_ERROR",
-        };
-      }
+      return await httpClient.delete<Cart>(`${this.baseUrl}?clearAll=true`);
     } else {
       // Clear guest cart
       const guestCart = clearGuestCartItems();
@@ -304,18 +250,7 @@ class CartApi {
    * Merge guest cart with user cart after login
    */
   async mergeGuestCart(guestCartItems: any[]): Promise<CartApiResponse> {
-    try {
-      const response = await axiosInstance.post(`${this.baseUrl}/merge-guest`, {
-        guestCartItems,
-      });
-      return response.data;
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.response?.data?.error || "Failed to merge guest cart",
-        code: error.response?.data?.code || "MERGE_GUEST_CART_ERROR",
-      };
-    }
+    return await httpClient.post<Cart>(`${this.baseUrl}/merge-guest`, { guestCartItems });
   }
 
   /**

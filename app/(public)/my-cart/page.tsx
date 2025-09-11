@@ -80,7 +80,7 @@ const MyCartPage = ({
     decrementQuantity,
     removeItemFromCart,
     formatPrice,
-  } = useCart();
+  } = useCart({ autoLoad: true });
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   const handleCheckout = () => {

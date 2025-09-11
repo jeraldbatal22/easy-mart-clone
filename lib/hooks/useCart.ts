@@ -3,7 +3,6 @@ import { useCallback, useEffect } from "react";
 
 import { AddToCartRequest, UpdateCartItemRequest } from "@/lib/api/cartApi";
 import { useAuth } from "./useAuth";
-import { useClientOnly } from "./useClientOnly";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import {
   clearError,
@@ -29,7 +28,8 @@ import {
   updateCartItem,
 } from "../slices/cart/action";
 
-export const useCart = () => {
+export const useCart = (props?: { autoLoad?: boolean }) => {
+  const autoLoad = props?.autoLoad ?? false;
   const dispatch = useAppDispatch();
 
   // Selectors
@@ -43,17 +43,17 @@ export const useCart = () => {
   const deliveryFee = useAppSelector(selectCartDeliveryFee);
   // const isAuthenticatedCart = useSelector(selectIsAuthenticated);
   const { isAuthenticated } = useAuth();
-  const isClient = useClientOnly();
   // Actions
   const loadCart = useCallback(() => {
-    if (isAuthenticated && isClient) {
+    if (!autoLoad) return;
+    if (isAuthenticated) {
       setAuthStatus(true);
       dispatch(fetchCart());
     } else {
       dispatch(loadGuestCart());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isClient]);
+  }, [dispatch, isAuthenticated, autoLoad]);
 
   const addItemToCart = useCallback(
     (data: AddToCartRequest) => {

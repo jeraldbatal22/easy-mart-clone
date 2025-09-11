@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ReduxProvider from "@/lib/providers/ReduxProvider";
 import { Toaster } from "@/components/ui/sonner";
+import CartInitializer from "./CartInitializer";
 
 export const metadata: Metadata = {
   title: "Easy Mart Clone",
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <ReduxProvider>
           <Toaster />
+          <CartInitializer />
           {children}
         </ReduxProvider>
       </body>

@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     if (!verificationCode) {
       throw new ValidationError("Invalid or expired verification code");
     }
-
+    
     // Mark the verification code as used
     verificationCode.isUsed = true;
     await verificationCode.save();
@@ -72,19 +72,27 @@ export async function POST(request: NextRequest) {
     // Update user verification status
     user.isVerified = true;
     user.verifiedAt = new Date();
+    user.role = user.role || "user"
     await user.save();
 
     // Generate JWT token and refresh token
     const token = signToken({
       id: user._id.toString(),
       email: user.email,
-      phone: user.phone,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      fullName: user.fullName
     });
 
     const refreshToken = signRefreshToken({
       id: user._id.toString(),
       email: user.email,
       phone: user.phone,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      fullName: user.fullName
     });
 
     // Return success response with user data and tokens
@@ -96,7 +104,7 @@ export async function POST(request: NextRequest) {
       },
       "OTP validated successfully"
     );
-
+ 
     return addSecurityHeaders(response);
 
   } catch (error) {

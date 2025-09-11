@@ -13,6 +13,7 @@ import { useState } from "react";
 export const Header = () => {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
+  // Keep Header passive: it reads from store only.
   const { items } = useCart();
   const isClient = useClientOnly();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

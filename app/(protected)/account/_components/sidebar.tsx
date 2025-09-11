@@ -119,7 +119,7 @@ const SidebarAccount = () => {
               <User className="w-10 h-10 text-primary-500" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
-              {user?.firstName ? user?.firstName : user?.email}
+              {user?.fullName ? user?.fullName : user?.email}
             </h3>
           </div>
 

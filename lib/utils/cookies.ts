@@ -7,7 +7,7 @@ export interface AuthCookies {
 }
 
 export const COOKIE_NAMES = {
-  TOKEN: 'auth_token',
+  TOKEN: 'access_token',
   REFRESH_TOKEN: 'refresh_token',
   USER_DATA: 'user_data',
 } as const;

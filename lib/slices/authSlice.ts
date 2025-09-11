@@ -9,6 +9,8 @@ export interface User {
   verifiedAt?: string;
   firstName?: string;
   lastName?: string;
+  role?: string;
+  fullName?: string;
 }
 
 export interface AuthState {

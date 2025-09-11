@@ -146,7 +146,7 @@ interface AuthState {
 
 Auth state is automatically persisted to secure HTTP-only cookies and restored on app reload. The following data is stored in cookies:
 
-- `auth_token` - JWT access token
+- `access_token` - JWT access token
 - `refresh_token` - Refresh token for token renewal
 - `user_data` - Serialized user information
 
