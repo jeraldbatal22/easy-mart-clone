@@ -45,18 +45,23 @@ export async function GET(
       throw new NotFoundError("Product not found");
     }
 
-    return addSecurityHeaders(
-      NextResponse.json(
-        {
-          success: true,
-          data: product,
-        },
-        { status: 200 }
-      )
+    const response = NextResponse.json(
+      {
+        success: true,
+        data: product,
+      },
+      { status: 200 }
     );
+
+    // Add cache headers for stale-while-revalidate
+    response.headers.set(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    );
+    response.headers.set('ETag', `"product-${id}"`);
+
+    return addSecurityHeaders(response);
   } catch (error) {
     return addSecurityHeaders(handleApiError(error));
   }
 }
-
-

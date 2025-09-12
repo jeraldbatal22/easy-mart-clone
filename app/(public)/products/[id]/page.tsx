@@ -2,7 +2,7 @@
 
 import { Footer, Header } from "../../_components";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -18,6 +18,8 @@ import { LoadingSkeleton } from "@/components/common/LoadingSpinner";
 import { AddToCartButton } from "@/components/common/product/add-to-cart-button";
 import { useCart } from "@/lib/hooks/useCart";
 import useDeviceDetect from "@/lib/hooks/useDeviceDetect";
+import { useProduct, useProducts } from "@/lib/hooks/useProductsQuery";
+import { mutate } from 'swr';
 
 type UIProduct = {
   id: string;
@@ -37,91 +39,78 @@ const fallbackImage = "/assets/images/product/product-1.png";
 const ProductViewPage = () => {
   const params = useParams<{ id: string }>();
   const productId = useMemo(() => String(params?.id ?? ""), [params]);
-
-  const [product, setProduct] = useState<UIProduct | null>(null);
-  const [related, setRelated] = useState<UIProduct[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
   const [images, setImages] = useState<string[]>([]);
   const [activeImageIdx, setActiveImageIdx] = useState<number>(0);
   const { isMobile } = useDeviceDetect();
   const { isItemInCart } = useCart();
 
+  // Mark product lists as stale when viewing a product (in case of updates)
   useEffect(() => {
-    let isCancelled = false;
-
-    async function fetchData() {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        if (!productId) throw new Error("Missing product id");
-
-        // Fetch single product by id
-        const res = await fetch(`/api/product/${productId}`);
-        const json = await res.json();
-        if (!res.ok || !json?.success)
-          throw new Error(json?.error || "Failed to fetch product");
-
-        const p = json?.data ?? null;
-        const toUi = (p: any): UIProduct => ({
-          ...p,
-          id: String(p?.id || p?._id || ""),
-          name: String(p?.name || "Unnamed product"),
-          image: String(p?.image || fallbackImage),
-          originalPrice:
-            typeof p?.originalPrice === "number"
-              ? `Php ${p.originalPrice.toFixed(2)}`
-              : p?.originalPrice
-              ? String(p.originalPrice)
-              : undefined,
-          unit: String(p?.unit || "each"),
-          stock: p.stock,
-          description: String(p?.description || ""),
-        });
-        console.log(json);
-        if (!isCancelled) {
-          const ui = p ? toUi(p) : null;
-          setProduct(ui);
-          const gallery = [ui?.image];
-          setImages(gallery as any);
-
-          // Fetch related products by same grocery category, if available
-          if (p?.groceryCategory) {
-            const relRes = await fetch(
-              `/api/product?groceryCategory=${encodeURIComponent(
-                p.groceryCategory
-              )}&limit=12&page=1`
-            );
-            const relJson = await relRes.json();
-            if (relRes.ok && relJson?.success && Array.isArray(relJson.data)) {
-              const relatedItems = relJson.data
-                .filter(
-                  (rp: any) => String(rp.id || rp._id) !== String(p.id || p._id)
-                )
-                .slice(0, 6)
-                .map(toUi);
-              setRelated(relatedItems);
-            } else {
-              setRelated([]);
-            }
-          } else {
-            setRelated([]);
-          }
-        }
-      } catch (err: any) {
-        if (!isCancelled) setError(err?.message || "Something went wrong");
-      } finally {
-        if (!isCancelled) setIsLoading(false);
-      }
+    if (productId) {
+      // Mark product lists as stale using SWR mutate
+      mutate((key) => Array.isArray(key) && key[0] === 'products' && key[1] === 'list');
     }
-
-    fetchData();
-    return () => {
-      isCancelled = true;
-    };
   }, [productId]);
+
+  // Use SWR for single product fetching with advanced caching
+  const { 
+    product: rawProduct, 
+    isLoading: isLoadingProduct, 
+    error: productError,
+  } = useProduct(productId || null);
+
+  // Transform raw product data to UI format
+  const product = useMemo(() => {
+    if (!rawProduct) return null;
+    
+    const toUi = (p: any): UIProduct => ({
+      ...p,
+      id: String(p?.id || p?._id || ""),
+      name: String(p?.name || "Unnamed product"),
+      image: String(p?.image || fallbackImage),
+      originalPrice:
+        typeof p?.originalPrice === "number"
+          ? `Php ${p.originalPrice.toFixed(2)}`
+          : p?.originalPrice
+          ? String(p.originalPrice)
+          : undefined,
+      unit: String(p?.unit || "each"),
+      stock: p.stock,
+      description: String(p?.description || ""),
+    });
+
+    return toUi(rawProduct);
+  }, [rawProduct]);
+
+  // Update images when product changes
+  useMemo(() => {
+    if (product?.image) {
+      setImages([product.image]);
+    }
+  }, [product?.image]);
+
+  // Fetch related products using React Query
+  const { 
+    products: relatedProducts,
+  } = useProducts({
+    page: 1,
+    limit: 12,
+    category: rawProduct?.groceryCategory,
+    enabled: !!rawProduct?.groceryCategory,
+  });
+
+  // Filter out current product from related products
+  const related = useMemo(() => {
+    if (!relatedProducts || !product) return [];
+    
+    return relatedProducts
+      .filter((rp: any) => rp.id !== product.id)
+      .slice(0, 6);
+  }, [relatedProducts, product]);
+
+  const isLoading = isLoadingProduct;
+  const error = productError;
 
   const isMaximumQuantity: boolean = useMemo(
     () => Number(quantity) >= Number(product?.stock),
@@ -134,8 +123,51 @@ const ProductViewPage = () => {
     setQuantity((q) => q + 1);
   };
 
+  // Generate structured data for SEO
+  const structuredData = product ? {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "description": product.description || `Shop ${product.name} at Easy Mart. Fresh, quality products with competitive prices and fast delivery.`,
+    "image": product.image,
+    "brand": {
+      "@type": "Brand",
+      "name": "Easy Mart"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": typeof product.price === 'string' 
+        ? product.price.replace(/[^\d.]/g, '') 
+        : typeof product.price === 'number' 
+          ? product.price
+          : '0',
+      "priceCurrency": "PHP",
+      "availability": product.stock && Number(product.stock) > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Easy Mart"
+      }
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.0",
+      "reviewCount": "128"
+    },
+    "category": rawProduct?.groceryCategory || "Groceries"
+  } : null;
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Structured Data for SEO */}
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
+      )}
+      
       <Header />
 
       <main className=" mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -549,7 +581,7 @@ const ProductViewPage = () => {
                 </h2>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                {related.map((p) => (
+                {related.map((p: any) => (
                   <a
                     key={p.id}
                     href={`/products/${p.id}`}

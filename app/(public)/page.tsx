@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   HeroBanner,
   CategoryNavigation,
@@ -9,76 +9,28 @@ import {
   Header,
   Footer,
 } from "./_components";
-
-interface UIProduct {
-  id: string;
-  name: string;
-  image: string;
-  price: string;
-  originalPrice?: string;
-  unit: string;
-  stock: string;
-  isVerified?: boolean;
-}
+import { useProducts } from "@/lib/hooks/useProductsQuery";
 
 const HomePage = () => {
   // const [selectedFilter, setSelectedFilter] = useState("Fresh bakery");
 
-  // Fetched product data from API (falls back to sample data above)
-  const [fetchedBestSellers, setFetchedBestSellers] = useState<UIProduct[]>([]);
-  const [pagination, setPagination] = useState<any>(null);
   const [page, setPage] = useState<number>(1);
-  const [limit] = useState<number>(6);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
-  const [productError, setProductError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
+  const [limit] = useState<number>(5);
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    undefined
+  );
 
-  useEffect(() => {
-    let isCancelled = false;
-    const fetchProducts = async () => {
-      try {
-        setIsLoadingProducts(true);
-        setProductError(null);
-        const categoryParam = selectedCategory ? `&groceryCategory=${encodeURIComponent(selectedCategory)}` : "";
-        const res = await fetch(`/api/product?limit=${limit}&page=${page}${categoryParam}`);
-        const json = await res.json();
-        if (!res.ok || !json?.success) {
-          throw new Error(json?.error || "Failed to fetch products");
-        }
-        console.log(json, "json")
-        const items = Array.isArray(json?.data) ? json.data : [];
-        setPagination(json.pagination)
-        // Map API products to UI shape, showing best sellers first if available
-        const mapped: UIProduct[] = items
-          .filter((p: any) => p && typeof p === "object")
-          .map((p: any) => ({
-            id: String(p.id || p._id || ""),
-            name: String(p.name || ""),
-            image: String(p.image || "/assets/images/product/product-1.png"),
-            price: typeof p.price === "number" ? `Php ${p.price.toFixed(2)}` : String(p.price ?? ""),
-            originalPrice: typeof p.originalPrice === "number" ? `$${p.originalPrice.toFixed(2)}` : (p.originalPrice ? String(p.originalPrice) : undefined),
-            unit: String(p.unit || "each"),
-            stock: String( (typeof p.stock === "number" ? (p.stock === 0 ? "Out of Stock" : `${p.stock} Left`) : "")),
-            isVerified: Boolean(p.isVerified),
-          }));
-        function compareByBest(a: UIProduct, b: UIProduct): number {
-          const aBestFlag = items.find((p: any) => String(p.id || p._id) === a.id)?.isBestSeller ? 1 : 0;
-          const bBestFlag = items.find((p: any) => String(p.id || p._id) === b.id)?.isBestSeller ? 1 : 0;
-          return Number(bBestFlag) - Number(aBestFlag);
-        }
-        const prioritized = mapped.sort(compareByBest);
-        if (!isCancelled) setFetchedBestSellers(prioritized);
-      } catch (err: any) {
-        if (!isCancelled) setProductError(err?.message || "Something went wrong");
-      } finally {
-        if (!isCancelled) setIsLoadingProducts(false);
-      }
-    };
-    fetchProducts();
-    return () => {
-      isCancelled = true;
-    };
-  }, [page, limit, selectedCategory]);
+  const {
+    products: fetchedBestSellers,
+    pagination,
+    isLoading: isLoadingProducts,
+    error: productError,
+  } = useProducts({
+    page,
+    limit,
+    category: selectedCategory,
+    enabled: true,
+  });
 
   // Category selection comes from CategoryNavigation
 
@@ -170,20 +122,104 @@ const HomePage = () => {
   //   "Fruits",
   // ];
 
+  // Generate structured data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    name: "Easy Mart",
+    description:
+      "Shop fresh groceries, best sellers, and quality products at Easy Mart. Fast delivery, competitive prices, and verified products.",
+    url: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+    logo: `${
+      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+    }/assets/icons/logo-with-text.png`,
+    image: `${
+      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+    }/assets/images/home/frame-1.png`,
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "PH",
+    },
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Grocery Products",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Fresh Bakery",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Dairy Products",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Fresh Meat",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Fresh Vegetables",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Product",
+            name: "Fresh Fruits",
+          },
+        },
+      ],
+    },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${
+          process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        }/products?search={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+
       <Header />
 
       <main>
         <HeroBanner />
-       
-        <CategoryNavigation selectedCategory={selectedCategory} onCategoryChange={handleCategoryChange} />
+
+        <CategoryNavigation
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+        />
 
         <ProductSection
           isLoading={isLoadingProducts}
           error={productError}
           title="Best Seller"
-          viewAllText={pagination ? `View All (+${pagination.total}) →` : undefined}
+          viewAllText={
+            pagination ? `View All (+${pagination.total}) →` : undefined
+          }
           pagination={pagination || undefined}
           products={fetchedBestSellers}
           onNextPage={handleProductBestNextPage}

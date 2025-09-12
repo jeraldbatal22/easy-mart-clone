@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ReduxProvider from "@/lib/providers/ReduxProvider";
+import { SWRProvider } from "@/lib/providers/SWRProvider";
 import { Toaster } from "@/components/ui/sonner";
 import CartInitializer from "./CartInitializer";
 
@@ -18,9 +19,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ReduxProvider>
-          <Toaster />
-          <CartInitializer />
-          {children}
+          <SWRProvider>
+            <Toaster />
+            <CartInitializer />
+            {children}
+          </SWRProvider>
         </ReduxProvider>
       </body>
     </html>

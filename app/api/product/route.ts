@@ -288,25 +288,31 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil(total / limit) || 1;
 
-    return addSecurityHeaders(
-      NextResponse.json(
-        {
-          success: true,
-          data: items,
-          pagination: {
-            page,
-            limit,
-            total,
-            totalPages,
-            hasNextPage: page < totalPages,
-            hasPrevPage: page > 1,
-          },
+    const response = NextResponse.json(
+      {
+        success: true,
+        data: items,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
         },
-        { status: 200 }
-      )
+      },
+      { status: 200 }
     );
+
+    // Add cache headers for stale-while-revalidate
+    response.headers.set(
+      'Cache-Control',
+      'public, s-maxage=300, stale-while-revalidate=600'
+    );
+    response.headers.set('ETag', `"products-${page}-${limit}-${groceryCategory || 'all'}"`);
+
+    return addSecurityHeaders(response);
   } catch (error) {
     return addSecurityHeaders(handleApiError(error));
   }
 }
-
