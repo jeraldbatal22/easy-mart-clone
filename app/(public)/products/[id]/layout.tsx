@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 
 interface ProductLayoutProps {
   children: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // Generate metadata for product pages
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const productId = params.id;
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id: productId } = await params;
 
   try {
     // Fetch product data for metadata
