@@ -83,7 +83,7 @@ export const ProductSection = ({
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
@@ -97,7 +97,8 @@ export const ProductSection = ({
                   {viewAllText}
                 </Button>
               )}
-              <button
+              <Button
+                variant="ghost"
                 className={`text-gray-400 transition-colors ${
                   hasPrevPage && !isLoading
                     ? "hover:text-gray-600"
@@ -108,8 +109,9 @@ export const ProductSection = ({
                 disabled={!hasPrevPage || isLoading}
               >
                 <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 className={`text-gray-400 transition-colors ${
                   hasNextPage && !isLoading
                     ? "hover:text-gray-600"
@@ -120,7 +122,7 @@ export const ProductSection = ({
                 disabled={!hasNextPage || isLoading}
               >
                 <ChevronRight className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
           )}
         </div>

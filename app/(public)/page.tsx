@@ -15,7 +15,7 @@ const HomePage = () => {
   // const [selectedFilter, setSelectedFilter] = useState("Fresh bakery");
 
   const [page, setPage] = useState<number>(1);
-  const [limit] = useState<number>(5);
+  const [limit] = useState<number>(6);
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
     undefined
   );
@@ -205,7 +205,7 @@ const HomePage = () => {
 
       <Header />
 
-      <main>
+      <main className=" mx-auto px-4 sm:px-6 lg:px-8">
         <HeroBanner />
 
         <CategoryNavigation

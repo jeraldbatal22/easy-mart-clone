@@ -10,6 +10,8 @@ export interface ProductType {
   stock: number;
   stockLabel: string; // e.g., "12 Left", "In Stock", "Out of Stock"
   groceryCategory: string; // Reference to groceryCategory
+  subGroceryCategory?: string; // Reference to subGroceryCategory
+  subSubGroceryCategory?: string; // Reference to subSubGroceryCategory
   isBestSeller?: boolean;
   isTrending?: boolean;
   isVerified?: boolean;
@@ -38,6 +40,7 @@ export interface ProductType {
   featured?: boolean;
   createdAt: Date;
   updatedAt: Date;
+  merchant: string;
 }
 
 const productSchema = new Schema<ProductType>(
@@ -51,6 +54,8 @@ const productSchema = new Schema<ProductType>(
     stock: { type: Number, required: true, min: 0 },
     stockLabel: { type: String, required: true, trim: true },
     groceryCategory: { type: String, required: true, ref: "groceryCategory" },
+    subGroceryCategory: { type: String, ref: "subGroceryCategory" },
+    subSubGroceryCategory: { type: String, ref: "subSubGroceryCategory" },
     isBestSeller: { type: Boolean, default: false },
     isTrending: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
@@ -76,7 +81,8 @@ const productSchema = new Schema<ProductType>(
       fiber: { type: Number, min: 0 }
     },
     isActive: { type: Boolean, default: true },
-    featured: { type: Boolean, default: false }
+    featured: { type: Boolean, default: false },
+    merchant: { type: String, ref: "Merchant" },
   },
   { timestamps: true }
 );
@@ -109,6 +115,8 @@ productSchema.set("toObject", { virtuals: true });
 
 // Indexes for better query performance
 productSchema.index({ groceryCategory: 1 });
+productSchema.index({ subGroceryCategory: 1 });
+productSchema.index({ subSubGroceryCategory: 1 });
 productSchema.index({ isBestSeller: 1 });
 productSchema.index({ isTrending: 1 });
 productSchema.index({ isActive: 1 });
@@ -119,6 +127,8 @@ productSchema.index({ rating: -1 }); // For sorting by rating
 productSchema.index({ stock: 1 }); // For inventory management
 productSchema.index({ featured: 1, isActive: 1 }); // Compound index for featured products
 productSchema.index({ groceryCategory: 1, isActive: 1, price: 1 }); // Compound index for groceryCategory filtering
+productSchema.index({ subGroceryCategory: 1, isActive: 1, price: 1 }); // Compound index for subGroceryCategory filtering
+productSchema.index({ subSubGroceryCategory: 1, isActive: 1, price: 1 }); // Compound index for subSubGroceryCategory filtering
 
 // Pre-save middleware for validation and auto-calculation
 productSchema.pre("save", function(next) {

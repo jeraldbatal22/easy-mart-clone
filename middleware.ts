@@ -59,11 +59,11 @@ export async function middleware(req: NextRequest) {
     const role = decodedToken?.role as string | undefined; // e.g., "user" | "admin"
 
     // 6️⃣ Admin-only routes
-    if (adminRoutes.some((route) => pathname.startsWith(route))) {
-      if (role !== "admin") {
-        return NextResponse.redirect(new URL("/unauthorized", req.url));
-      }
-    }
+    // if (adminRoutes.some((route) => pathname.startsWith(route))) {
+    //   if (role !== "admin") {
+    //     return NextResponse.redirect(new URL("/unauthorized", req.url));
+    //   }
+    // }
   } catch (err) {
     console.error("JWT verification failed:", err);
     const signinUrl = new URL("/signin", req.url);

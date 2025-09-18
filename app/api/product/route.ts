@@ -20,6 +20,7 @@ const createProductSchema = z.object({
   stock: z.preprocess((v) => (typeof v === "string" ? Number(v) : v), z.number().int().min(0)),
   stockLabel: z.string().optional(),
   groceryCategory: z.string().min(1, "Grocery Category is required").trim(),
+  subGroceryCategory: z.string().min(1, "Sub Grocery Category is required").trim(),
   isBestSeller: z.preprocess((v) => (v === "true" || v === true), z.boolean().optional()).default(false),
   isTrending: z.preprocess((v) => (v === "true" || v === true), z.boolean().optional()).default(false),
   isVerified: z.preprocess((v) => (v === "true" || v === true), z.boolean().optional()).default(false),
@@ -176,6 +177,7 @@ export async function POST(request: NextRequest) {
       stock: parsed.data.stock,
       stockLabel,
       groceryCategory: parsed.data.groceryCategory,
+      subGroceryCategory: parsed.data.subGroceryCategory,
       isBestSeller: parsed.data.isBestSeller,
       isTrending: parsed.data.isTrending,
       isVerified: parsed.data.isVerified,
@@ -312,6 +314,225 @@ export async function GET(request: NextRequest) {
     response.headers.set('ETag', `"products-${page}-${limit}-${groceryCategory || 'all'}"`);
 
     return addSecurityHeaders(response);
+  } catch (error) {
+    return addSecurityHeaders(handleApiError(error));
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    await connectDB();
+    // Rate limiting
+    const clientIP = getClientIP(request);
+    if (!checkRateLimit(`product_update:${clientIP}`, 10, 1 * 60 * 1000)) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Too many requests. Please try again later.",
+            code: "RATE_LIMIT_EXCEEDED",
+          },
+          { status: 429 }
+        )
+      );
+    }
+
+    const formData = await request.formData();
+    const id = formData.get("id");
+    const file = formData.get("file");
+
+    if (!id) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Product ID is required",
+            code: "MISSING_ID",
+          },
+          { status: 400 }
+        )
+      );
+    }
+
+    // Check if product exists
+    const existingProduct = await Product.findById(id);
+    if (!existingProduct) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Product not found",
+            code: "PRODUCT_NOT_FOUND",
+          },
+          { status: 404 }
+        )
+      );
+    }
+
+    // Collect fields from formData
+    const raw: Record<string, any> = {};
+    for (const [key, value] of formData.entries()) {
+      if (key === "file" || key === "id") continue;
+      raw[key] = value as any;
+    }
+
+    const parsed = createProductSchema.safeParse(raw);
+    if (!parsed.success) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Validation failed",
+            details: parsed.error.issues,
+            code: "VALIDATION_ERROR",
+          },
+          { status: 400 }
+        )
+      );
+    }
+
+    // Handle image: either provided via file or imageUrl
+    let imageUrl = parsed.data.imageUrl || existingProduct.image;
+    if (file instanceof Blob) {
+      // Forward upload to internal upload API
+      const uploadForm = new FormData();
+      uploadForm.set("file", file);
+      uploadForm.set("type", "product");
+
+      const uploadRes = await fetch(`${request.nextUrl.origin}/api/upload`, {
+        method: "POST",
+        body: uploadForm,
+      });
+
+      if (!uploadRes.ok) {
+        const errPayload = await uploadRes.json().catch(() => ({}));
+        return addSecurityHeaders(
+          NextResponse.json(
+            {
+              success: false,
+              error: "Failed to upload image",
+              details: errPayload?.error || errPayload?.message || "UPLOAD_FAILED",
+              code: "UPLOAD_FAILED",
+            },
+            { status: 400 }
+          )
+        );
+      }
+
+      const uploaded: any = await uploadRes.json();
+      imageUrl = uploaded.url;
+    }
+
+    // Auto-generate stockLabel if not provided
+    let stockLabel = parsed.data.stockLabel;
+    if (!stockLabel) {
+      if (parsed.data.stock === 0) stockLabel = "Out of Stock";
+      else if (parsed.data.stock <= 10) stockLabel = `${parsed.data.stock} Left`;
+      else stockLabel = "In Stock";
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      {
+        name: parsed.data.name,
+        description: parsed.data.description,
+        image: imageUrl,
+        price: parsed.data.price,
+        originalPrice: parsed.data.originalPrice,
+        unit: parsed.data.unit,
+        stock: parsed.data.stock,
+        stockLabel,
+        groceryCategory: parsed.data.groceryCategory,
+        subGroceryCategory: parsed.data.subGroceryCategory,
+        isBestSeller: parsed.data.isBestSeller,
+        isTrending: parsed.data.isTrending,
+        isVerified: parsed.data.isVerified,
+        discount: parsed.data.discount,
+        tags: parsed.data.tags,
+        weight: parsed.data.weight,
+        dimensions: parsed.data.dimensions,
+        nutritionalInfo: parsed.data.nutritionalInfo,
+        featured: parsed.data.featured,
+      },
+      { new: true }
+    );
+
+    return addSecurityHeaders(
+      NextResponse.json(
+        {
+          success: true,
+          message: "Product updated successfully",
+          data: updatedProduct,
+        },
+        { status: 200 }
+      )
+    );
+  } catch (error) {
+    return addSecurityHeaders(handleApiError(error));
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    await connectDB();
+
+    const clientIP = getClientIP(request);
+    if (!checkRateLimit(`product_delete:${clientIP}`, 5, 1 * 60 * 1000)) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Too many requests. Please try again later.",
+            code: "RATE_LIMIT_EXCEEDED",
+          },
+          { status: 429 }
+        )
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Product ID is required",
+            code: "MISSING_ID",
+          },
+          { status: 400 }
+        )
+      );
+    }
+
+    // Check if product exists
+    const existingProduct = await Product.findById(id);
+    if (!existingProduct) {
+      return addSecurityHeaders(
+        NextResponse.json(
+          {
+            success: false,
+            error: "Product not found",
+            code: "PRODUCT_NOT_FOUND",
+          },
+          { status: 404 }
+        )
+      );
+    }
+
+    // Soft delete by setting isActive to false
+    await Product.findByIdAndUpdate(id, { isActive: false });
+
+    return addSecurityHeaders(
+      NextResponse.json(
+        {
+          success: true,
+          message: "Product deleted successfully",
+        },
+        { status: 200 }
+      )
+    );
   } catch (error) {
     return addSecurityHeaders(handleApiError(error));
   }

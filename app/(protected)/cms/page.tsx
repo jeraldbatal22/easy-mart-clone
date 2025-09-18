@@ -49,22 +49,42 @@ const CmsPage = () => {
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("name", "Grapes");
-      formData.append("groceryCategory", "68beb23cde1a5f21222ca473");
-      formData.append("stock", "30");
-      formData.append("price", "750");
-      formData.append("unit", "lb");
 
-      const response = await fetch("/api/product", {
-        method: "POST",
-        body: formData,
-      });
+      // CATEGORY CREATION
+      // formData.append("name", "Dairy & Eggs");
 
-      const result = await response.json();
+      // const response = await fetch("/api/category/grocery", {
+      //   method: "POST",
+      //   body: formData,
+      // });
 
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to upload category");
-      }
+      // SUB CATEGORY CREATION
+      // formData.append("name", "Apple");
+      // formData.append("groceryCategoryId", "68beb23cde1a5f21222ca473");
+
+      // const response = await fetch("/api/category/subcategory/grocery", {
+      //   method: "POST",
+      //   body: formData,
+      // });
+
+      // PRODUCT CREATION
+      // formData.append("name", "Rosmary Egg");
+      // formData.append("groceryCategory", "68c77a1aac2adef49893093e");
+      // formData.append("subGroceryCategory", "68c77c12ac2adef49893095e");
+      // formData.append("stock", "10");
+      // formData.append("price", "120");
+      // formData.append("unit", "lb");
+
+      // const response = await fetch("/api/product", {
+      //   method: "POST",
+      //   body: formData,
+      // });
+
+      // const result = await response.json();
+
+      // if (!response.ok) {
+      //   throw new Error(result.error || "Failed to upload category");
+      // }
 
       setUploadState({
         isUploading: false,

@@ -11,6 +11,16 @@ export interface UIProduct {
   stock: string;
   isVerified?: boolean;
   isBestSeller?: boolean;
+  groceryCategory: string;
+  subGroceryCategory: string;
+  stockLabel?: string;
+}
+
+export interface UICategory {
+  id: string;
+  name: string;
+  icon: string;
+  imageUrl?: string;
 }
 
 interface ProductResponse {
@@ -27,10 +37,33 @@ interface ProductResponse {
   error?: string;
 }
 
+interface CategoryResponse {
+  success: boolean;
+  data: {
+    categories: any[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+  };
+  error?: string;
+}
+
 interface UseProductsOptions {
   page?: number;
   limit?: number;
   category?: string;
+  enabled?: boolean;
+}
+
+interface UseCategoriesOptions {
+  page?: number;
+  limit?: number;
+  search?: string;
   enabled?: boolean;
 }
 
@@ -48,17 +81,42 @@ const fetchProducts = async (url: string): Promise<ProductResponse> => {
   return json;
 };
 
+// Fetcher function for categories
+const fetchCategories = async (url: string): Promise<CategoryResponse> => {
+  const res = await fetch(url);
+  const json = await res.json();
+  
+  if (!res.ok || !json?.success) {
+    const error = new Error(json?.error || 'Failed to fetch categories');
+    (error as any).status = res.status;
+    throw error;
+  }
+  
+  return json;
+};
+
 // Transform raw product data to UI format
 const transformProduct = (p: any): UIProduct => ({
   id: String(p.id || p._id || ''),
   name: String(p.name || ''),
   image: String(p.image || '/assets/images/product/product-1.png'),
-  price: typeof p.price === 'number' ? `Php ${p.price.toFixed(2)}` : String(p.price ?? ''),
-  originalPrice: typeof p.originalPrice === 'number' ? `$${p.originalPrice.toFixed(2)}` : (p.originalPrice ? String(p.originalPrice) : undefined),
+  price: p.price ?? 0,
+  originalPrice: p.originalPrice || 0,
   unit: String(p.unit || 'each'),
-  stock: String(typeof p.stock === 'number' ? (p.stock === 0 ? 'Out of Stock' : `${p.stock} Left`) : ''),
+  stock: p.stock || 0,
+  stockLabel: p.stockLabel,
   isVerified: Boolean(p.isVerified),
   isBestSeller: Boolean(p.isBestSeller),
+  groceryCategory: p.groceryCategory,
+  subGroceryCategory: p.subGroceryCategory
+});
+
+// Transform raw category data to UI format
+const transformCategory = (c: any): UICategory => ({
+  id: String(c._id || c.id || ''),
+  name: String(c.name || ''),
+  icon: '🛒',
+  imageUrl: c.imageUrl ? String(c.imageUrl) : undefined,
 });
 
 // SWR key factory for products
@@ -68,6 +126,13 @@ export const productKeys = {
   list: (filters: Record<string, any>) => [...productKeys.lists(), filters] as const,
   details: () => [...productKeys.all(), 'detail'] as const,
   detail: (id: string) => [...productKeys.details(), id] as const,
+};
+
+// SWR key factory for categories
+export const categoryKeys = {
+  all: () => ['categories'] as const,
+  lists: () => [...categoryKeys.all(), 'list'] as const,
+  list: (filters: Record<string, any>) => [...categoryKeys.lists(), filters] as const,
 };
 
 export const useProducts = (options: UseProductsOptions = {}) => {
@@ -199,6 +264,73 @@ export const useProduct = (id: string | null) => {
   };
 };
 
+// Hook for fetching categories
+export const useFetchCategories = (options: UseCategoriesOptions = {}) => {
+  const {
+    page = 1,
+    limit = 20,
+    search,
+    enabled = true
+  } = options;
+
+  // Build the API URL
+  const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+  const url = enabled ? `/api/category/grocery?limit=${limit}&page=${page}${searchParam}` : null;
+
+  // Use SWR for data fetching
+  const {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    mutate: mutateData,
+  } = useSWR(
+    url,
+    fetchCategories,
+    {
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      refreshInterval: 0, // Disable automatic refresh by default
+      dedupingInterval: 2000,
+      errorRetryCount: 3,
+      shouldRetryOnError: (error: any) => {
+        if (error?.status >= 400 && error?.status < 500) {
+          return false;
+        }
+        return true;
+      },
+    }
+  );
+
+  // Transform categories
+  const categories = useMemo(() => {
+    if (!data?.data?.categories || !Array.isArray(data.data.categories)) {
+      return [];
+    }
+
+    return data.data.categories
+      .filter((c: any) => c && typeof c === 'object')
+      .map(transformCategory);
+  }, [data?.data?.categories]);
+
+  // Manual refresh function
+  const refresh = () => {
+    mutateData();
+  };
+
+  return {
+    categories,
+    pagination: data?.data?.pagination || null,
+    isLoading,
+    isFetching: isValidating,
+    isError: !!error,
+    error: error?.message || null,
+    refresh,
+    isStale: isValidating,
+    isRefetching: isValidating,
+  };
+};
+
 // // Hook for infinite scrolling products
 // export const useInfiniteProducts = (options: Omit<UseProductsOptions, 'page'> = {}) => {
 //   const { limit = 6, category, enabled = true } = options;
@@ -301,3 +433,88 @@ export const useProduct = (id: string | null) => {
 //     });
 //   };
 // };
+
+// Hook for fetching subcategories
+export const useFetchSubcategories = (options: {
+  categoryId?: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+  enabled?: boolean;
+} = {}) => {
+  const {
+    categoryId,
+    page = 1,
+    limit = 20,
+    search,
+    enabled = true
+  } = options;
+
+  // Build the API URL
+  const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+  const url = enabled && categoryId ? `/api/category/subcategory?categoryId=${categoryId}&limit=${limit}&page=${page}${searchParam}` : null;
+
+  // Use SWR for data fetching
+  const {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    mutate: mutateData,
+  } = useSWR(
+    url,
+    async (url: string) => {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subcategories: ${response.statusText}`);
+      }
+      return response.json();
+    },
+    {
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      refreshInterval: 0,
+      dedupingInterval: 2000,
+      errorRetryCount: 3,
+      shouldRetryOnError: (error: any) => {
+        if (error?.status >= 400 && error?.status < 500) {
+          return false;
+        }
+        return true;
+      },
+    }
+  );
+
+  // Transform subcategories
+  const subcategories = useMemo(() => {
+    if (!data?.data?.subcategories || !Array.isArray(data.data.subcategories)) {
+      return [];
+    }
+
+    return data.data.subcategories
+      .filter((c: any) => c && typeof c === 'object')
+      .map((subcategory: any) => ({
+        id: subcategory._id || subcategory.id,
+        name: subcategory.name,
+        groceryCategory: subcategory.groceryCategory,
+        imageUrl: subcategory.imageUrl,
+      }));
+  }, [data?.data?.subcategories]);
+
+  // Manual refresh function
+  const refresh = () => {
+    mutateData();
+  };
+
+  return {
+    subcategories,
+    pagination: data?.data?.pagination || null,
+    isLoading,
+    isFetching: isValidating,
+    isError: !!error,
+    error: error?.message || null,
+    refresh,
+    isStale: isValidating,
+    isRefetching: isValidating,
+  };
+};
