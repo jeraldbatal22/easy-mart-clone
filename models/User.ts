@@ -17,9 +17,9 @@ const userSchema = new Schema(
   {
     // MongoDB will use _id as the primary key, but we can add a virtual 'id' if needed
     email: { type: String, unique: true, sparse: true, default: null },
-    phone: { type: String, unique: true, sparse: true, default: null },
+    phone: { type: String, unique: true, sparse: true },
     password: { type: String, default: null },
-    googleId: { type: String, unique: true, sparse: true, default: null },
+    googleId: { type: String, unique: true, sparse: true },
     provider: {
       type: String,
       enum: Object.values(AuthProvider),

@@ -17,7 +17,9 @@ import { isTokenExpired } from "@/lib/auth";
 const protectedRoutes = ["/checkout", "/account/orders", "account/orders/:id", "/account/details", "/account/my-cart" ];
 
 const adminRoutes = [
-  "/cms",
+  "/admin/categories",
+  "/admin/products",
+  "/admin/sub-categories",
 ];
 
 export async function middleware(req: NextRequest) {
@@ -59,11 +61,11 @@ export async function middleware(req: NextRequest) {
     const role = decodedToken?.role as string | undefined; // e.g., "user" | "admin"
 
     // 6️⃣ Admin-only routes
-    // if (adminRoutes.some((route) => pathname.startsWith(route))) {
-    //   if (role !== "admin") {
-    //     return NextResponse.redirect(new URL("/unauthorized", req.url));
-    //   }
-    // }
+    if (adminRoutes.some((route) => pathname.startsWith(route))) {
+      if (role !== "admin") {
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
+      }
+    }
   } catch (err) {
     console.error("JWT verification failed:", err);
     const signinUrl = new URL("/signin", req.url);
@@ -93,6 +95,6 @@ export const config = {
     "/account/:path*",
 
     // Admin
-    "/cms/:path*",
+    "/admin/:path*",
   ],
 };

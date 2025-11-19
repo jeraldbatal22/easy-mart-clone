@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, Phone, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+// import { cn } from "@/lib/utils";
 import { signupWithEmail, signupWithPhone } from "./actions";
 import { useRouter } from "next/navigation";
 
@@ -27,7 +28,7 @@ type EmailForm = z.infer<typeof emailSchema>;
 type PhoneForm = z.infer<typeof phoneSchema>;
 
 export default function SignupPage() {
-  const [method, setMethod] = useState<SignupMethod>("email");
+  const [method] = useState<SignupMethod>("email");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -63,7 +64,9 @@ export default function SignupPage() {
         setError(result.error || "Failed to register with email");
       }
     } catch (error: any) {
-      setError(error.message || "An unexpected error occurred. Please try again.");
+      setError(
+        error.message || "An unexpected error occurred. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -88,26 +91,59 @@ export default function SignupPage() {
         setError(result.error || "Failed to register with phone");
       }
     } catch (error: any) {
-      setError(error.message || "An unexpected error occurred. Please try again.");
+      setError(
+        error.message || "An unexpected error occurred. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-84px)] bg-white">
-      <div className="px-4 sm:px-6">
-        <div className="min-h-[calc(100vh-92px)] flex items-center justify-center">
-          <div className="w-full flex justify-center">
-            <div className="w-full max-w-md">
-              <h1 className="text-2xl font-semibold text-start">Sign up</h1>
-              <div className="mt-6 w-full rounded-2xl border border-neutral-200 p-4 sm:p-6 shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-white via-purple-50/40 to-white">
+      <div className="mx-auto flex min-h-screen max-w-6xl items-center px-4 py-12 sm:px-6">
+        <div className="grid w-full gap-10">
+          {/* <div className="space-y-5 text-center lg:text-left">
+            <p className="inline-flex rounded-full bg-purple-100 px-4 py-1 text-sm font-medium text-purple-700">
+              Create your account
+            </p>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-semibold text-gray-900 sm:text-4xl">
+                Join Easy Mart for a faster checkout and personalized deals.
+              </h1>
+              <p className="text-base text-gray-600">
+                Sign up in seconds with your email or phone number and start
+                tracking orders, wishlists, and rewards immediately.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-purple-100 bg-white/70 p-6 text-left shadow-sm backdrop-blur">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Why create an account?
+              </h2>
+              <ul className="mt-4 space-y-2 text-sm text-gray-600">
+                <li>• Save your favorite items and shopping lists.</li>
+                <li>• Unlock personalized offers and early drops.</li>
+                <li>• Keep every order and invoice in one place.</li>
+              </ul>
+            </div>
+          </div> */}
+          <div className="w-full max-w-md place-self-center">
+            <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl">
+              <div className="space-y-2 text-center">
+                <h1 className="text-2xl font-semibold text-gray-900">
+                  Sign up
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Enter your preferred email method to receive a secure OTP.
+                </p>
+              </div>
+              <div className="mt-6 w-full">
                 {error && (
                   <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
                     {error}
                   </div>
                 )}
-                <div className="flex gap-2 flex-col sm:flex-row">
+                {/* <div className="flex gap-2 flex-col sm:flex-row">
                   <Button
                     variant="ghost"
                     onClick={() => setMethod("email")}
@@ -134,19 +170,21 @@ export default function SignupPage() {
                     <Phone className="h-4 w-4 mr-2" />
                     <span>Phone</span>
                   </Button>
-                </div>
+                </div> */}
 
                 {method === "email" ? (
                   <form
                     onSubmit={emailForm.handleSubmit(onSubmitEmail)}
                     className="mt-5 space-y-4"
                   >
-                    <label className="block text-sm font-medium">Email</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
                     <input
                       {...emailForm.register("email")}
                       type="email"
                       placeholder="Enter your email"
-                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 outline-none focus:border-[#a21caf]"
+                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                     />
                     {emailForm.formState.errors.email && (
                       <p className="text-sm text-red-600">
@@ -156,7 +194,7 @@ export default function SignupPage() {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="mt-2 h-12 w-full gap-2 rounded-full"
+                      className="mt-4 h-12 w-full gap-2 rounded-full bg-purple-600 text-white hover:bg-purple-700"
                     >
                       {isLoading ? (
                         <>
@@ -176,12 +214,14 @@ export default function SignupPage() {
                     onSubmit={phoneForm.handleSubmit(onSubmitPhone)}
                     className="mt-5 space-y-4"
                   >
-                    <label className="block text-sm font-medium">Phone</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Phone
+                    </label>
                     <input
                       {...phoneForm.register("phone")}
                       type="tel"
                       placeholder="Enter your phone"
-                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 outline-none focus:border-[#a21caf]"
+                      className="w-full rounded-lg border border-neutral-300 px-3 py-2 outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                     />
                     {phoneForm.formState.errors.phone && (
                       <p className="text-sm text-red-600">
@@ -191,7 +231,7 @@ export default function SignupPage() {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="mt-2 w-full h-12 gap-2 rounded-full"
+                      className="mt-4 w-full h-12 gap-2 rounded-full bg-purple-600 text-white hover:bg-purple-700"
                     >
                       {isLoading ? (
                         <>
@@ -208,7 +248,7 @@ export default function SignupPage() {
                   </form>
                 )}
 
-                <div className="relative mt-8 text-center text-sm text-neutral-500">
+                {/* <div className="relative mt-8 text-center text-sm text-neutral-500">
                   <span className="bg-white px-2">Or</span>
                   <div className="absolute inset-x-0 top-1/2 -z-10 h-px -translate-y-1/2 bg-neutral-200" />
                 </div>
@@ -256,7 +296,29 @@ export default function SignupPage() {
                     </svg>
                     <span>Sign up with Google</span>
                   </Button>
-                </div>
+                </div> */}
+              </div>
+              <div className="mt-6 space-y-3 text-center text-sm text-gray-600">
+                {/* <p>
+                  By continuing, you agree to our{" "}
+                  <Link href="/legal/terms" className="font-semibold text-purple-600 hover:underline">
+                    Terms
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/legal/privacy" className="font-semibold text-purple-600 hover:underline">
+                    Privacy Policy
+                  </Link>
+                  .
+                </p> */}
+                <p>
+                  Already have an account?{" "}
+                  <Link
+                    href="/signin"
+                    className="font-semibold text-purple-600 hover:underline"
+                  >
+                    Sign in
+                  </Link>
+                </p>
               </div>
             </div>
           </div>
