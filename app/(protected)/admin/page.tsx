@@ -9,7 +9,6 @@ import {
   ShoppingCart, 
   TrendingUp,
   DollarSign,
-  Eye
 } from "lucide-react";
 import Link from "next/link";
 
@@ -188,7 +187,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900">New product added</p>
-              <p className="text-xs text-gray-500">"Organic Apples" was added to Fruits category</p>
+              <p className="text-xs text-gray-500">`Organic Apples` was added to Fruits category</p>
             </div>
             <span className="text-xs text-gray-500">2 hours ago</span>
           </div>
@@ -199,7 +198,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-gray-900">Category updated</p>
-              <p className="text-xs text-gray-500">"Dairy Products" category was modified</p>
+              <p className="text-xs text-gray-500">`Dairy Products` category was modified</p>
             </div>
             <span className="text-xs text-gray-500">4 hours ago</span>
           </div>
